@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time & Billing Tracker</title>
+    <title>Time Tracker</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Inter Font -->
@@ -44,13 +44,13 @@
 
     <div class="container mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-lg">
 
-        <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-6">Time & Billing Tracker</h1>
+        <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-6">Time Tracker</h1>
 
         <!-- Tab Navigation -->
         <nav class="flex justify-center border-b border-gray-200 mb-8 overflow-x-auto whitespace-nowrap">
             <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg active" data-tab="dashboard">Dashboard</button>
             <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="projects">Projects & Tasks</button>
-            <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="clients">Clients & Coworkers</button>
+            <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="clients">Clients</button>
             <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="reports">Reports</button>
         </nav>
 
@@ -66,15 +66,40 @@
                         <span id="timer-task-name" class="text-gray-500"></span>
                     </p>
                     <p id="timer-display" class="timer-display text-5xl sm:text-6xl font-extrabold text-gray-900 mt-2 mb-4">00:00:00</p>
-                    <button id="stop-timer-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105">Stop Timer</button>
+                    <button id="stop-timer-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
                 <div id="no-active-timer-card" class="text-center text-gray-500 p-4">
-                    <p class="text-lg">No active timer. Start one from your tasks below!</p>
+                    <p class="text-lg">No active timer. Start one from your projects below!</p>
                 </div>
             </div>
+            
+            <h2 class="text-2xl font-bold mb-4">Your Active Projects</h2>
+            <div id="dashboard-projects-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Active Projects as small cards will be rendered here -->
+            </div>
 
-            <div id="dashboard-projects-list">
-                <!-- Active Projects and tasks will be rendered here -->
+            <div class="bg-gray-50 p-6 rounded-xl shadow-inner mt-8">
+                <h2 class="text-2xl font-bold mb-4">Add Manual Time</h2>
+                <form id="manual-time-form" class="space-y-4">
+                    <div>
+                        <label for="manual-project-select" class="block text-sm font-medium text-gray-700">Project</label>
+                        <select id="manual-project-select" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2"></select>
+                    </div>
+                    <div>
+                        <label for="manual-task-description" class="block text-sm font-medium text-gray-700">Task Description</label>
+                        <input type="text" id="manual-task-description" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
+                    </div>
+                    <div>
+                        <label for="manual-minutes" class="block text-sm font-medium text-gray-700">Minutes Spent</label>
+                        <input type="number" id="manual-minutes" min="1" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
+                    </div>
+                    <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Time</button>
+                </form>
             </div>
             
         </section>
@@ -91,10 +116,6 @@
                     <label for="project-client" class="block text-sm font-medium text-gray-700">Client</label>
                     <select id="project-client" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></select>
                 </div>
-                <div>
-                    <label for="project-rate" class="block text-sm font-medium text-gray-700">Hourly Rate ($)</label>
-                    <input type="number" id="project-rate" step="0.01" value="0" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                </div>
                 <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Project</button>
             </form>
 
@@ -107,51 +128,25 @@
             </div>
         </section>
 
-        <!-- Clients & Coworkers Section -->
+        <!-- Clients Section -->
         <section id="clients" class="tab-content hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <h2 class="text-2xl font-bold mb-4">Add New Client</h2>
+            <form id="add-client-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner">
                 <div>
-                    <h2 class="text-2xl font-bold mb-4">Add New Client</h2>
-                    <form id="add-client-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner">
-                        <div>
-                            <label for="client-name" class="block text-sm font-medium text-gray-700">Client Name</label>
-                            <input type="text" id="client-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                        </div>
-                        <div>
-                            <label for="client-details" class="block text-sm font-medium text-gray-700">Details</label>
-                            <textarea id="client-details" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></textarea>
-                        </div>
-                        <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Client</button>
-                    </form>
-
-                    <div class="mt-8">
-                        <h2 class="text-xl font-bold mb-4">Your Clients</h2>
-                        <div id="clients-list">
-                            <!-- Clients will be rendered here -->
-                        </div>
-                    </div>
+                    <label for="client-name" class="block text-sm font-medium text-gray-700">Client Name</label>
+                    <input type="text" id="client-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
                 </div>
-
                 <div>
-                    <h2 class="text-2xl font-bold mb-4">Add New Coworker</h2>
-                    <form id="add-coworker-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner">
-                        <div>
-                            <label for="coworker-name" class="block text-sm font-medium text-gray-700">Coworker Name</label>
-                            <input type="text" id="coworker-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                        </div>
-                        <div>
-                            <label for="coworker-details" class="block text-sm font-medium text-gray-700">Details</label>
-                            <textarea id="coworker-details" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></textarea>
-                        </div>
-                        <button type="submit" class="w-full bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Coworker</button>
-                    </form>
-                    
-                    <div class="mt-8">
-                        <h2 class="text-xl font-bold mb-4">Your Coworkers</h2>
-                        <div id="coworkers-list">
-                            <!-- Coworkers will be rendered here -->
-                        </div>
-                    </div>
+                    <label for="client-details" class="block text-sm font-medium text-gray-700">Details</label>
+                    <textarea id="client-details" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></textarea>
+                </div>
+                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Client</button>
+            </form>
+
+            <div class="mt-8">
+                <h2 class="text-xl font-bold mb-4">Your Clients</h2>
+                <div id="clients-list">
+                    <!-- Clients will be rendered here -->
                 </div>
             </div>
         </section>
@@ -259,8 +254,8 @@
             }
 
             // --- IndexedDB Database Operations ---
-            const DB_NAME = 'timeBillingDB';
-            const DB_VERSION = 1;
+            const DB_NAME = 'timeTrackerDB';
+            const DB_VERSION = 2; // Increased version for schema change
             let db;
 
             const openDB = () => {
@@ -275,14 +270,10 @@
                         if (!db.objectStoreNames.contains('tasks')) {
                             const tasksStore = db.createObjectStore('tasks', { keyPath: 'id', autoIncrement: true });
                             tasksStore.createIndex('projectId', 'projectId', { unique: false });
-                            tasksStore.createIndex('coworkerId', 'coworkerId', { unique: false });
                             tasksStore.createIndex('timestamp', 'timestamp', { unique: false });
                         }
                         if (!db.objectStoreNames.contains('clients')) {
                             db.createObjectStore('clients', { keyPath: 'id', autoIncrement: true });
-                        }
-                        if (!db.objectStoreNames.contains('coworkers')) {
-                            db.createObjectStore('coworkers', { keyPath: 'id', autoIncrement: true });
                         }
                     };
 
@@ -344,7 +335,6 @@
 
             // --- State and Variables ---
             let clients = [];
-            let coworkers = [];
             let projects = [];
             let activeTimer = null;
             let timerInterval = null;
@@ -363,6 +353,10 @@
                 timerTaskName: document.getElementById('timer-task-name'),
                 timerDisplay: document.getElementById('timer-display'),
                 stopTimerBtn: document.getElementById('stop-timer-btn'),
+                manualTimeForm: document.getElementById('manual-time-form'),
+                manualProjectSelect: document.getElementById('manual-project-select'),
+                manualTaskDescription: document.getElementById('manual-task-description'),
+                manualMinutes: document.getElementById('manual-minutes'),
                 // Projects
                 addProjectForm: document.getElementById('add-project-form'),
                 projectsList: document.getElementById('projects-list'),
@@ -371,9 +365,6 @@
                 // Clients
                 addClientForm: document.getElementById('add-client-form'),
                 clientsList: document.getElementById('clients-list'),
-                // Coworkers
-                addCoworkerForm: document.getElementById('add-coworker-form'),
-                coworkersList: document.getElementById('coworkers-list'),
                 // Reports
                 reportForm: document.getElementById('report-form'),
                 reportOutput: document.getElementById('report-output'),
@@ -408,24 +399,6 @@
                     `).join('');
             };
 
-            const renderCoworkers = (coworkers) => {
-                elements.coworkersList.innerHTML = coworkers.length === 0
-                    ? '<p class="text-gray-500">No coworkers added yet.</p>'
-                    : coworkers.map(coworker => `
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex justify-between items-center mb-2">
-                            <div>
-                                <h3 class="font-semibold text-gray-900">${coworker.name}</h3>
-                                <p class="text-sm text-gray-500">${coworker.details}</p>
-                            </div>
-                            <button class="delete-btn text-red-500 hover:text-red-700 font-bold p-2" data-id="${coworker.id}" data-type="coworker">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                    `).join('');
-            };
-
             const renderProjects = async () => {
                 projects = await getAllData('projects');
                 const projectsToRender = showingCompletedProjects ? projects.filter(p => p.isComplete) : projects.filter(p => !p.isComplete);
@@ -440,7 +413,6 @@
                                 <div>
                                     <h3 class="text-xl font-bold ${project.isComplete ? 'text-gray-600 line-through' : 'text-blue-800'}">${project.name}</h3>
                                     <p class="text-sm text-gray-500">Client: ${client ? client.name : 'N/A'}</p>
-                                    <p class="text-sm text-gray-500">Rate: $${project.rate} / hr</p>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     ${project.isComplete
@@ -458,14 +430,6 @@
                             <h4 class="font-semibold text-gray-700 text-lg mb-2">Tasks</h4>
                             <div class="space-y-4" data-project-id="${project.id}">
                                 <!-- Tasks for this project will be rendered here -->
-                                <form class="add-task-form bg-gray-50 p-4 rounded-xl shadow-inner flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4" data-project-id="${project.id}">
-                                    <input type="text" placeholder="Task description" required class="flex-grow w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-3 py-2">
-                                    <select required class="w-full sm:w-auto rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-3 py-2">
-                                        <option value="">Assign Coworker</option>
-                                        ${coworkers.map(coworker => `<option value="${coworker.id}">${coworker.name}</option>`).join('')}
-                                    </select>
-                                    <button type="submit" class="w-full sm:w-auto bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-md hover:bg-gray-300 transition-colors">Add Task</button>
-                                </form>
                             </div>
                             ` : ''}
                         </div>
@@ -477,10 +441,48 @@
                     : projectsHTML;
                 
                 // Render dashboard projects only if not showing completed projects
-                elements.dashboardProjectsList.innerHTML = showingCompletedProjects ? '' : projectsHTML;
+                if (!showingCompletedProjects) {
+                    renderDashboardProjects();
+                } else {
+                    elements.dashboardProjectsList.innerHTML = '';
+                }
                 
                 // Re-attach event listeners for dynamic content
                 projectsToRender.forEach(project => renderProjectTasks(project.id));
+            };
+
+            const renderDashboardProjects = () => {
+                const activeProjects = projects.filter(p => !p.isComplete);
+                const dashboardHTML = activeProjects.map(project => {
+                    const client = clients.find(c => c.id === project.clientId);
+                    const clientName = client ? client.name : 'N/A';
+                    return `
+                        <div class="bg-white p-4 rounded-xl shadow-md border-t-4 border-blue-500 flex flex-col justify-between aspect-square w-full">
+                            <div>
+                                <h3 class="font-bold text-lg text-blue-800">${project.name}</h3>
+                                <p class="text-sm text-gray-500">${clientName}</p>
+                            </div>
+                            <form class="start-timer-form mt-4 space-y-2 flex-grow flex flex-col justify-end">
+                                <div>
+                                    <input type="text" placeholder="Task description" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-3 py-2">
+                                </div>
+                                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold p-3 rounded-md shadow transition-transform transform hover:scale-105">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M5 3l14 9-14 9V3z"></path>
+                                    </svg>
+                                </button>
+                            </form>
+                        </div>
+                    `;
+                }).join('');
+                elements.dashboardProjectsList.innerHTML = dashboardHTML || '<p class="text-gray-500 text-center">No active projects to display. Please add one in the "Projects & Tasks" tab.</p>';
+
+                // Update manual time form project options
+                elements.manualProjectSelect.innerHTML = activeProjects.length === 0 
+                    ? '<option value="">No projects available</option>'
+                    : '<option value="">Select a Project</option>' + activeProjects.map(project => `
+                        <option value="${project.id}">${project.name}</option>
+                    `).join('');
             };
 
             const renderProjectTasks = async (projectId) => {
@@ -491,15 +493,12 @@
                 if (!taskContainer) return;
 
                 const taskHTML = projectTasks.map(task => {
-                    const coworker = coworkers.find(c => c.id === task.coworkerId);
-                    const durationInMinutes = task.duration / 60000;
                     const durationText = formatTime(task.duration);
                     
                     return `
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mb-2">
+                        <div class="bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-200 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mb-2">
                             <div class="flex-grow w-full">
                                 <p class="font-semibold text-gray-900 break-words">${task.description}</p>
-                                <p class="text-sm text-gray-500">Assigned to: ${coworker ? coworker.name : 'N/A'}</p>
                                 <p class="text-sm text-gray-500">Duration: ${durationText}</p>
                                 <p class="text-xs text-gray-400">Date: ${new Date(task.timestamp).toLocaleDateString()}</p>
                             </div>
@@ -513,19 +512,7 @@
                         </div>
                     `;
                 }).join('');
-
-                const timerAndManualButtons = `
-                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                        <button class="start-timer-btn w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-md shadow transition-transform transform hover:scale-105" data-project-id="${projectId}">Start Timer</button>
-                        <form class="manual-time-form w-full flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2" data-project-id="${projectId}">
-                            <input type="number" step="1" min="1" placeholder="Mins" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-3 py-2">
-                            <button type="submit" class="w-full sm:w-auto bg-gray-200 text-gray-800 font-semibold px-4 py-2 rounded-md hover:bg-gray-300 transition-colors">Add Manually</button>
-                        </form>
-                    </div>
-                `;
-
-                // Combine timer/manual buttons with tasks
-                taskContainer.innerHTML = (projectTasks.length === 0 ? '' : taskHTML) + timerAndManualButtons;
+                taskContainer.innerHTML = taskHTML || '<p class="text-gray-500">No tasks logged yet.</p>';
             };
 
             const formatTime = (milliseconds) => {
@@ -569,30 +556,15 @@
                 showMessage('Client added successfully!');
             });
             
-            elements.addCoworkerForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('coworker-name').value;
-                const details = document.getElementById('coworker-details').value;
-                if (!name) {
-                    showMessage('Please enter a coworker name.');
-                    return;
-                }
-                await addData('coworkers', { name, details });
-                elements.addCoworkerForm.reset();
-                await loadAllData();
-                showMessage('Coworker added successfully!');
-            });
-
             elements.addProjectForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const name = document.getElementById('project-name').value;
                 const clientId = parseInt(document.getElementById('project-client').value);
-                const rate = parseFloat(document.getElementById('project-rate').value);
-                if (!name || isNaN(clientId) || isNaN(rate)) {
+                if (!name || isNaN(clientId)) {
                     showMessage('Please fill out all project fields correctly.');
                     return;
                 }
-                await addData('projects', { name, clientId, rate, isComplete: false });
+                await addData('projects', { name, clientId, isComplete: false });
                 elements.addProjectForm.reset();
                 await loadAllData();
                 showMessage('Project added successfully!');
@@ -603,51 +575,59 @@
                 await renderProjects();
             });
 
-            document.addEventListener('submit', async (e) => {
-                if (e.target.matches('.add-task-form')) {
-                    e.preventDefault();
-                    const projectId = parseInt(e.target.dataset.projectId);
-                    const description = e.target.querySelector('input[type="text"]').value;
-                    const coworkerId = parseInt(e.target.querySelector('select').value);
-                    
-                    if (!description || !coworkerId) {
-                        showMessage('Please enter a task description and select a coworker.');
-                        return;
-                    }
+            elements.manualTimeForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const projectId = parseInt(elements.manualProjectSelect.value);
+                const description = elements.manualTaskDescription.value;
+                const minutes = parseInt(elements.manualMinutes.value);
 
-                    const task = {
-                        projectId,
-                        coworkerId,
-                        description,
-                        duration: 0,
-                        timestamp: Date.now()
-                    };
-                    await addData('tasks', task);
-                    await renderProjectTasks(projectId);
-                    e.target.reset();
-                    showMessage('Task added successfully!');
+                if (!projectId || !description || isNaN(minutes) || minutes <= 0) {
+                    showMessage('Please fill all fields for manual time entry.');
+                    return;
                 }
-                if (e.target.matches('.manual-time-form')) {
+                
+                const task = {
+                    projectId,
+                    description,
+                    duration: minutes * 60 * 1000,
+                    timestamp: Date.now()
+                };
+                await addData('tasks', task);
+                elements.manualTimeForm.reset();
+                showMessage('Manual time added successfully!');
+            });
+
+            document.addEventListener('submit', async (e) => {
+                if (e.target.matches('.start-timer-form')) {
                     e.preventDefault();
-                    const projectId = parseInt(e.target.dataset.projectId);
-                    const minutes = parseInt(e.target.querySelector('input[type="number"]').value);
-                    
-                    if (isNaN(minutes) || minutes <= 0) {
-                        showMessage('Please enter a valid number of minutes.');
+                    if (activeTimer) {
+                        showMessage('A timer is already running. Please stop it first.');
+                        return;
+                    }
+                    const projectId = parseInt(e.target.closest('.start-timer-form').dataset.projectId);
+                    const description = e.target.closest('.start-timer-form').querySelector('input[type="text"]').value;
+
+                    if (!description) {
+                        showMessage('Please enter a task description.');
                         return;
                     }
 
-                    const task = {
+                    const project = projects.find(p => p.id === projectId);
+                    if (!project) return;
+                    
+                    activeTimer = {
                         projectId,
-                        coworkerId: null, // Manual entries don't have a coworker assigned here
-                        description: `Manual entry: ${minutes} minutes`,
-                        duration: minutes * 60 * 1000,
-                        timestamp: Date.now()
+                        description,
+                        startTime: Date.now()
                     };
-                    await addData('tasks', task);
-                    await renderProjectTasks(projectId);
-                    e.target.reset();
-                    showMessage('Manual time added successfully!');
+                    timerStartTime = activeTimer.startTime;
+                    timerInterval = setInterval(updateTimerDisplay, 1000);
+                    
+                    elements.timerProjectName.textContent = project.name;
+                    elements.timerTaskName.textContent = description;
+                    elements.noActiveTimerCard.classList.add('hidden');
+                    elements.activeTimerCard.classList.remove('hidden');
+                    elements.timerDisplay.textContent = '00:00:00';
                 }
             });
 
@@ -687,83 +667,12 @@
                     }
                 }
 
-                if (e.target.closest('.start-timer-btn')) {
-                    if (activeTimer) {
-                        showMessage('A timer is already running. Please stop it first.');
-                        return;
-                    }
-                    const btn = e.target.closest('.start-timer-btn');
-                    const projectId = parseInt(btn.dataset.projectId);
-                    
-                    const project = projects.find(p => p.id === projectId);
-                    if (!project) return;
-                    
-                    // Show a message box to select coworker and task description
-                    const coworkerOptions = coworkers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-                    const customMessage = `
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Task Description</label>
-                                <input type="text" id="task-desc" class="w-full px-3 py-2 border rounded-md" placeholder="e.g., Design UI mockups">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Assign to Coworker</label>
-                                <select id="task-coworker" class="w-full px-3 py-2 border rounded-md">
-                                    <option value="">Select Coworker</option>
-                                    ${coworkerOptions}
-                                </select>
-                            </div>
-                        </div>
-                    `;
-                    modalTitle.textContent = 'Start Timer';
-                    modalMessage.innerHTML = customMessage;
-                    modalConfirmBtn.textContent = 'Start';
-                    modalConfirmBtn.classList.remove('hidden');
-                    modalCancelBtn.classList.remove('hidden');
-                    
-                    const onStartTimerConfirm = () => {
-                        const description = document.getElementById('task-desc').value;
-                        const coworkerId = parseInt(document.getElementById('task-coworker').value);
-                        
-                        if (!description || !coworkerId) {
-                            showMessage('Please fill out all fields.');
-                            return false; // Prevent modal from closing
-                        }
-                        
-                        activeTimer = {
-                            projectId,
-                            description,
-                            coworkerId,
-                            startTime: Date.now()
-                        };
-                        timerStartTime = activeTimer.startTime;
-                        timerInterval = setInterval(updateTimerDisplay, 1000);
-                        
-                        elements.timerProjectName.textContent = project.name;
-                        elements.timerTaskName.textContent = description;
-                        elements.noActiveTimerCard.classList.add('hidden');
-                        elements.activeTimerCard.classList.remove('hidden');
-                        elements.timerDisplay.textContent = '00:00:00';
-                        
-                        closeModal();
-                    };
-
-                    modalConfirmBtn.onclick = onStartTimerConfirm;
-                    modalCancelBtn.onclick = closeModal;
-
-                    modalBackdrop.classList.remove('hidden');
-                    modalContainer.classList.remove('hidden');
-                    modal.classList.add('scale-100', 'opacity-100');
-                    modal.classList.remove('scale-95', 'opacity-0');
-                }
-
-                if (e.target.matches('#stop-timer-btn')) {
+                if (e.target.matches('#stop-timer-btn') || e.target.closest('#stop-timer-btn')) {
                     if (activeTimer) {
                         const duration = Date.now() - activeTimer.startTime;
                         const task = {
                             projectId: activeTimer.projectId,
                             description: activeTimer.description,
-                            coworkerId: activeTimer.coworkerId,
                             duration,
                             timestamp: Date.now()
                         };
@@ -802,30 +711,21 @@
                     const project = projects.find(p => p.id === task.projectId);
                     if (!project) return;
                     const client = clients.find(c => c.id === project.clientId);
-                    const coworker = coworkers.find(c => c.id === task.coworkerId);
                     
                     const clientName = client ? client.name : 'Unknown Client';
                     const projectName = project.name;
-                    const coworkerName = coworker ? coworker.name : 'Unassigned';
                     const durationInHours = task.duration / 3600000;
-                    const cost = durationInHours * project.rate;
                     
                     if (!report[clientName]) {
-                        report[clientName] = { totalTime: 0, totalCost: 0, projects: {} };
+                        report[clientName] = { totalTime: 0, projects: {} };
                     }
                     if (!report[clientName].projects[projectName]) {
-                        report[clientName].projects[projectName] = { totalTime: 0, totalCost: 0, coworkers: {} };
-                    }
-                    if (!report[clientName].projects[projectName].coworkers[coworkerName]) {
-                        report[clientName].projects[projectName].coworkers[coworkerName] = { totalTime: 0, totalCost: 0 };
+                        report[clientName].projects[projectName] = { totalTime: 0, tasks: [] };
                     }
                     
                     report[clientName].totalTime += durationInHours;
-                    report[clientName].totalCost += cost;
                     report[clientName].projects[projectName].totalTime += durationInHours;
-                    report[clientName].projects[projectName].totalCost += cost;
-                    report[clientName].projects[projectName].coworkers[coworkerName].totalTime += durationInHours;
-                    report[clientName].projects[projectName].coworkers[coworkerName].totalCost += cost;
+                    report[clientName].projects[projectName].tasks.push({ description: task.description, duration: durationInHours });
                 });
 
                 renderReport(report);
@@ -834,18 +734,15 @@
             const renderReport = (report) => {
                 let reportHTML = '';
                 let grandTotalTime = 0;
-                let grandTotalCost = 0;
 
                 for (const clientName in report) {
                     const clientReport = report[clientName];
                     grandTotalTime += clientReport.totalTime;
-                    grandTotalCost += clientReport.totalCost;
                     
                     reportHTML += `
                         <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500 mb-6">
                             <h3 class="text-xl font-bold text-gray-800">${clientName}</h3>
                             <p class="text-sm text-gray-500">Total Time: ${clientReport.totalTime.toFixed(2)} hours</p>
-                            <p class="text-sm text-gray-500">Total Billing: $${clientReport.totalCost.toFixed(2)}</p>
                             
                             <div class="mt-4 space-y-4">
                                 ${Object.keys(clientReport.projects).map(projectName => {
@@ -854,17 +751,13 @@
                                         <div class="bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-200">
                                             <h4 class="font-semibold text-gray-700">${projectName}</h4>
                                             <p class="text-xs text-gray-500">Total Time: ${projectReport.totalTime.toFixed(2)} hours</p>
-                                            <p class="text-xs text-gray-500">Total Billing: $${projectReport.totalCost.toFixed(2)}</p>
                                             <div class="mt-2 text-sm space-y-1">
-                                                ${Object.keys(projectReport.coworkers).map(coworkerName => {
-                                                    const coworkerReport = projectReport.coworkers[coworkerName];
-                                                    return `
-                                                        <div class="flex justify-between items-center text-gray-600">
-                                                            <span>- ${coworkerName}:</span>
-                                                            <span class="font-medium">${coworkerReport.totalTime.toFixed(2)} hrs ($${coworkerReport.totalCost.toFixed(2)})</span>
-                                                        </div>
-                                                    `;
-                                                }).join('')}
+                                                ${projectReport.tasks.map(task => `
+                                                    <div class="flex justify-between items-center text-gray-600">
+                                                        <span>- ${task.description}:</span>
+                                                        <span class="font-medium">${task.duration.toFixed(2)} hrs</span>
+                                                    </div>
+                                                `).join('')}
                                             </div>
                                         </div>
                                     `;
@@ -879,9 +772,8 @@
                 } else {
                     elements.reportOutput.innerHTML = `
                         <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow mb-6 text-center">
-                            <h3 class="text-2xl font-bold text-blue-800">Grand Totals</h3>
+                            <h3 class="text-2xl font-bold text-blue-800">Grand Total</h3>
                             <p class="text-lg text-gray-600">Total Time: <span class="font-semibold">${grandTotalTime.toFixed(2)} hours</span></p>
-                            <p class="text-lg text-gray-600">Total Billing: <span class="font-semibold">$${grandTotalCost.toFixed(2)}</span></p>
                         </div>
                         ${reportHTML}
                     `;
@@ -904,7 +796,6 @@
             const exportDataAsJSON = async () => {
                 const allData = {
                     clients: await getAllData('clients'),
-                    coworkers: await getAllData('coworkers'),
                     projects: await getAllData('projects'),
                     tasks: await getAllData('tasks')
                 };
@@ -918,33 +809,28 @@
                 const allTasks = await getAllData('tasks');
                 const allProjects = await getAllData('projects');
                 const allClients = await getAllData('clients');
-                const allCoworkers = await getAllData('coworkers');
                 
                 // Create mappings for quick lookup
                 const projectsMap = new Map(allProjects.map(p => [p.id, p]));
                 const clientsMap = new Map(allClients.map(c => [c.id, c]));
-                const coworkersMap = new Map(allCoworkers.map(c => [c.id, c]));
 
                 // Define CSV header
-                const headers = ['Date', 'Project', 'Client', 'Coworker', 'Task Description', 'Duration (mins)', 'Duration (hours)', 'Billing ($)'];
+                const headers = ['Date', 'Project', 'Client', 'Task Description', 'Duration (mins)', 'Duration (hours)'];
                 let csvContent = headers.join(',') + '\n';
                 
                 // Populate CSV with task data
                 allTasks.forEach(task => {
                     const project = projectsMap.get(task.projectId);
                     const client = project ? clientsMap.get(project.clientId) : null;
-                    const coworker = coworkersMap.get(task.coworkerId);
                     
                     const date = new Date(task.timestamp).toLocaleDateString();
                     const projectName = project ? project.name : 'N/A';
                     const clientName = client ? client.name : 'N/A';
-                    const coworkerName = coworker ? coworker.name : 'N/A';
                     const description = task.description.replace(/,/g, ''); // Remove commas to prevent issues
                     const durationMins = (task.duration / 60000).toFixed(2);
                     const durationHours = (task.duration / 3600000).toFixed(2);
-                    const billing = project ? (durationHours * project.rate).toFixed(2) : '0.00';
 
-                    const row = [date, projectName, clientName, coworkerName, description, durationMins, durationHours, billing];
+                    const row = [date, projectName, clientName, description, durationMins, durationHours];
                     csvContent += row.join(',') + '\n';
                 });
                 
@@ -959,10 +845,8 @@
             const loadAllData = async () => {
                 await openDB();
                 clients = await getAllData('clients');
-                coworkers = await getAllData('coworkers');
                 projects = await getAllData('projects');
                 renderClients(clients);
-                renderCoworkers(coworkers);
                 renderProjects();
             };
 
