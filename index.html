@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time Tracker</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Pomodoro Tracker</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <style>
         body {
@@ -19,181 +17,168 @@
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #f1f5f9;
+            background: #1f2937;
         }
         ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
+            background: #4b5563;
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+            background: #6b7280;
         }
         .container {
             max-width: 1200px;
-        }
-        .tab-button.active {
-            border-color: #2563eb;
-            color: #2563eb;
         }
         .timer-display {
             font-variant-numeric: tabular-nums;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 sm:p-8 text-gray-800">
+<body class="bg-gray-900 text-white min-h-screen p-4 sm:p-8">
 
-    <div class="container mx-auto bg-white p-6 sm:p-10 rounded-xl shadow-lg">
+    <div class="container mx-auto bg-gray-800 p-6 sm:p-10 rounded-xl shadow-lg border border-gray-700">
 
-        <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-6">Time Tracker</h1>
-
-        <!-- Main Navigation with settings button -->
-        <nav class="flex justify-between items-center border-b border-gray-200 mb-8">
-            <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg active" data-tab="dashboard">Dashboard</button>
-            <button id="open-settings-btn" class="bg-gray-200 text-gray-700 font-semibold p-3 rounded-full hover:bg-gray-300 transition-colors">
+        <header class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-50 text-center">Pomodoro Tracker</h1>
+            <button id="open-settings-btn" class="bg-gray-700 text-gray-300 font-semibold p-3 rounded-full hover:bg-gray-600 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                 </svg>
             </button>
-        </nav>
-        
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="tab-content">
-            <div class="mb-8 p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800">
-                <h3 class="text-xl font-bold">Current Month's Time</h3>
-                <p class="text-2xl font-semibold"><span id="current-month-hours">0.00</span> hours</p>
-            </div>
-            
-            <h2 class="text-2xl font-bold mb-4">Your Active Projects</h2>
-            <div id="dashboard-projects-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                <!-- Active Projects as small cards will be rendered here -->
+        </header>
+
+        <section id="dashboard">
+            <div class="flex flex-col items-center mb-8 p-6 bg-gray-900 rounded-xl shadow-inner border border-gray-700">
+                <div class="text-gray-400 font-semibold mb-4" id="timer-status">Work</div>
+                <p id="main-timer-display" class="timer-display text-6xl sm:text-8xl font-extrabold text-blue-500 mb-6">25:00</p>
+                <div class="flex space-x-4">
+                    <button id="pomodoro-start-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 hidden">Start</button>
+                    <button id="pomodoro-pause-btn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 hidden">Pause</button>
+                    <button id="pomodoro-stop-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 hidden">Stop</button>
+                    <button id="pomodoro-skip-btn" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 hidden">Skip</button>
+                </div>
             </div>
 
-            <div class="bg-gray-50 p-6 rounded-xl shadow-inner mt-8">
-                <h2 class="text-2xl font-bold mb-4">Add Manual Time</h2>
-                <form id="manual-time-form" class="space-y-4">
-                    <div>
-                        <label for="manual-project-select" class="block text-sm font-medium text-gray-700">Project</label>
-                        <select id="manual-project-select" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2"></select>
-                    </div>
-                    <div>
-                        <label for="manual-task-description" class="block text-sm font-medium text-gray-700">Task Description</label>
-                        <input type="text" id="manual-task-description" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
-                    </div>
-                    <div>
-                        <label for="manual-minutes" class="block text-sm font-medium text-gray-700">Minutes Spent</label>
-                        <input type="number" id="manual-minutes" min="1" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
-                    </div>
-                    <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Time</button>
-                </form>
-            </div>
-            
+            <h2 class="text-2xl font-bold mb-4">Your Active Projects</h2>
+            <div id="dashboard-projects-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                </div>
         </section>
 
-        <!-- Settings Modal -->
         <div id="settings-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden z-50 overflow-y-auto">
             <div class="flex items-start justify-center min-h-screen pt-12">
-                <div class="bg-white p-6 sm:p-10 rounded-xl shadow-lg w-full max-w-4xl mx-4 my-8">
-                    <div class="flex justify-between items-center border-b pb-4 mb-6">
-                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Settings</h2>
-                        <button id="close-settings-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                <div class="bg-gray-800 p-6 sm:p-10 rounded-xl shadow-lg w-full max-w-4xl mx-4 my-8 border border-gray-700">
+                    <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-50">Settings</h2>
+                        <button id="close-settings-btn" class="text-gray-400 hover:text-gray-50 transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
                         </button>
                     </div>
 
-                    <!-- Settings Tabs -->
-                    <div class="flex border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap">
-                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg active" data-tab="project-management">Projects</button>
-                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="client-management">Clients</button>
-                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="report-generation">Reports</button>
+                    <div class="flex border-b border-gray-700 mb-6 overflow-x-auto whitespace-nowrap">
+                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg active" data-tab="project-management">Projects</button>
+                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="client-management">Clients</button>
+                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="report-generation">Reports</button>
+                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="pomodoro-settings">Pomodoro</button>
                     </div>
 
-                    <!-- Project Management Tab -->
                     <div id="project-management" class="settings-tab-content">
                         <h3 class="text-xl font-bold mb-4">Add or Edit Project</h3>
-                        <form id="add-project-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
+                        <form id="add-project-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mb-8">
                             <div>
-                                <label for="project-name" class="block text-sm font-medium text-gray-700">Project Name</label>
-                                <input type="text" id="project-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                                <label for="project-name" class="block text-sm font-medium text-gray-400">Project Name</label>
+                                <input type="text" id="project-name" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
                             </div>
                             <div>
-                                <label for="project-client" class="block text-sm font-medium text-gray-700">Client</label>
-                                <select id="project-client" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></select>
+                                <label for="project-client" class="block text-sm font-medium text-gray-400">Client</label>
+                                <select id="project-client" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></select>
                             </div>
                             <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Project</button>
                         </form>
                         
                         <div class="mt-8 flex justify-between items-center mb-4">
                             <h3 class="text-xl font-bold">Your Projects</h3>
-                            <button id="toggle-completed-btn" class="bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-md hover:bg-gray-300 transition-colors text-sm">View Completed Projects</button>
+                            <button id="toggle-completed-btn" class="bg-gray-700 text-gray-300 font-semibold px-4 py-2 rounded-md hover:bg-gray-600 transition-colors text-sm">View Completed Projects</button>
                         </div>
                         <div id="projects-list">
-                            <!-- Projects will be rendered here -->
-                        </div>
+                            </div>
                     </div>
 
-                    <!-- Client Management Tab -->
                     <div id="client-management" class="settings-tab-content hidden">
                         <h3 class="text-xl font-bold mb-4">Add New Client</h3>
-                        <form id="add-client-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner">
+                        <form id="add-client-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner">
                             <div>
-                                <label for="client-name" class="block text-sm font-medium text-gray-700">Client Name</label>
-                                <input type="text" id="client-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                                <label for="client-name" class="block text-sm font-medium text-gray-400">Client Name</label>
+                                <input type="text" id="client-name" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
                             </div>
                             <div>
-                                <label for="client-details" class="block text-sm font-medium text-gray-700">Details</label>
-                                <textarea id="client-details" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></textarea>
+                                <label for="client-details" class="block text-sm font-medium text-gray-400">Details</label>
+                                <textarea id="client-details" rows="3" class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></textarea>
                             </div>
                             <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Client</button>
                         </form>
                         <div class="mt-8">
                             <h3 class="text-xl font-bold mb-4">Your Clients</h3>
                             <div id="clients-list">
-                                <!-- Clients will be rendered here -->
-                            </div>
+                                </div>
                         </div>
                     </div>
 
-                    <!-- Report Generation Tab -->
                     <div id="report-generation" class="settings-tab-content hidden">
                         <h3 class="text-xl font-bold mb-4">Generate Report</h3>
-                        <form id="report-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
+                        <form id="report-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mb-8">
                             <div>
-                                <label for="report-start-date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                                <input type="date" id="report-start-date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                                <label for="report-start-date" class="block text-sm font-medium text-gray-400">Start Date</label>
+                                <input type="date" id="report-start-date" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
                             </div>
                             <div>
-                                <label for="report-end-date" class="block text-sm font-medium text-gray-700">End Date</label>
-                                <input type="date" id="report-end-date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                                <label for="report-end-date" class="block text-sm font-medium text-gray-400">End Date</label>
+                                <input type="date" id="report-end-date" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
                             </div>
                             <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Generate Report</button>
                         </form>
                         <div id="report-output">
-                            <!-- Report will be displayed here -->
-                        </div>
+                            </div>
                         <div class="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                            <button id="export-json-btn" class="w-full sm:w-1/2 bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export All Data as JSON</button>
-                            <button id="export-csv-btn" class="w-full sm:w-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export Time Log as CSV</button>
+                            <button id="export-json-btn" class="w-full sm:w-1/2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export All Data as JSON</button>
+                            <button id="export-csv-btn" class="w-full sm:w-1/2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export Time Log as CSV</button>
                         </div>
+                    </div>
+
+                    <div id="pomodoro-settings" class="settings-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4">Pomodoro Settings</h3>
+                        <form id="pomodoro-settings-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner">
+                            <div>
+                                <label for="work-duration" class="block text-sm font-medium text-gray-400">Work Duration (minutes)</label>
+                                <input type="number" id="work-duration" value="25" min="1" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                            </div>
+                            <div>
+                                <label for="break-duration" class="block text-sm font-medium text-gray-400">Break Duration (minutes)</label>
+                                <input type="number" id="break-duration" value="5" min="1" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                            </div>
+                            <div>
+                                <label for="long-break-duration" class="block text-sm font-medium text-gray-400">Long Break Duration (minutes)</label>
+                                <input type="number" id="long-break-duration" value="15" min="1" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                            </div>
+                            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Save Settings</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Modal for Alerts -->
         <div id="modal-backdrop" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden transition-opacity z-50"></div>
         <div id="modal-container" class="fixed inset-0 flex items-center justify-center p-4 hidden z-50">
-            <div id="modal" class="bg-white p-6 rounded-lg shadow-2xl max-w-sm w-full transform transition-all scale-95 opacity-0">
-                <div class="text-lg font-semibold text-gray-800 mb-4" id="modal-title"></div>
-                <div class="text-sm text-gray-600 mb-6" id="modal-message"></div>
+            <div id="modal" class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full transform transition-all scale-95 opacity-0 border border-gray-700">
+                <div class="text-lg font-semibold text-gray-50 mb-4" id="modal-title"></div>
+                <div class="text-sm text-gray-400 mb-6" id="modal-message"></div>
                 <div class="flex justify-end space-x-2">
                     <button id="modal-confirm-btn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">OK</button>
                     <button id="modal-cancel-btn" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors">Cancel</button>
                 </div>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -242,7 +227,6 @@
                 }, 300);
             }
 
-            // A simpler function to display a quick message
             function showMessage(message, title = 'Notification') {
                 modalTitle.textContent = title;
                 modalMessage.textContent = message;
@@ -257,8 +241,8 @@
             }
 
             // --- IndexedDB Database Operations ---
-            const DB_NAME = 'timeTrackerDB';
-            const DB_VERSION = 2;
+            const DB_NAME = 'pomodoroTrackerDB';
+            const DB_VERSION = 3; 
             let db;
 
             const openDB = () => {
@@ -277,6 +261,9 @@
                         }
                         if (!db.objectStoreNames.contains('clients')) {
                             db.createObjectStore('clients', { keyPath: 'id', autoIncrement: true });
+                        }
+                        if (!db.objectStoreNames.contains('pomodoroSettings')) {
+                            db.createObjectStore('pomodoroSettings', { keyPath: 'id' });
                         }
                     };
 
@@ -339,20 +326,23 @@
             // --- State and Variables ---
             let clients = [];
             let projects = [];
-            let activeTimer = null;
-            let timerInterval = null;
-            let showingCompletedProjects = false;
-            let projectsForManualTime = [];
+            let activeProject = null;
+            let pomodoroState = 'work'; // 'work', 'break', 'longBreak'
+            let pomodoroTimer = null;
+            let timeRemaining = 0;
+            let pomodoroCounts = 0;
+            let pomodoroSettings = { work: 25, break: 5, longBreak: 15 };
 
             const elements = {
                 // Main UI
+                mainTimerDisplay: document.getElementById('main-timer-display'),
+                pomodoroStartBtn: document.getElementById('pomodoro-start-btn'),
+                pomodoroPauseBtn: document.getElementById('pomodoro-pause-btn'),
+                pomodoroStopBtn: document.getElementById('pomodoro-stop-btn'),
+                pomodoroSkipBtn: document.getElementById('pomodoro-skip-btn'),
+                timerStatus: document.getElementById('timer-status'),
                 dashboardProjectsList: document.getElementById('dashboard-projects-list'),
                 openSettingsBtn: document.getElementById('open-settings-btn'),
-                currentMonthHours: document.getElementById('current-month-hours'),
-                manualTimeForm: document.getElementById('manual-time-form'),
-                manualProjectSelect: document.getElementById('manual-project-select'),
-                manualTaskDescription: document.getElementById('manual-task-description'),
-                manualMinutes: document.getElementById('manual-minutes'),
                 // Settings Modal
                 settingsModal: document.getElementById('settings-modal'),
                 closeSettingsBtn: document.getElementById('close-settings-btn'),
@@ -371,197 +361,103 @@
                 reportOutput: document.getElementById('report-output'),
                 exportJsonBtn: document.getElementById('export-json-btn'),
                 exportCsvBtn: document.getElementById('export-csv-btn'),
+                // Pomodoro Settings
+                pomodoroSettingsForm: document.getElementById('pomodoro-settings-form'),
+                workDurationInput: document.getElementById('work-duration'),
+                breakDurationInput: document.getElementById('break-duration'),
+                longBreakDurationInput: document.getElementById('long-break-duration'),
+            };
+
+            // --- Pomodoro Timer Logic ---
+            const startPomodoro = (duration, state) => {
+                if (pomodoroTimer) return;
+                pomodoroState = state;
+                timeRemaining = duration * 60;
+                
+                elements.pomodoroStartBtn.classList.add('hidden');
+                elements.pomodoroPauseBtn.classList.remove('hidden');
+                elements.pomodoroStopBtn.classList.remove('hidden');
+                elements.pomodoroSkipBtn.classList.remove('hidden');
+                
+                elements.timerStatus.textContent = state.charAt(0).toUpperCase() + state.slice(1);
+                
+                pomodoroTimer = setInterval(() => {
+                    timeRemaining--;
+                    updateTimerDisplay();
+                    if (timeRemaining <= 0) {
+                        handleTimerEnd();
+                    }
+                }, 1000);
+            };
+
+            const pausePomodoro = () => {
+                clearInterval(pomodoroTimer);
+                pomodoroTimer = null;
+                elements.pomodoroPauseBtn.classList.add('hidden');
+                elements.pomodoroStartBtn.classList.remove('hidden');
+            };
+
+            const stopPomodoro = () => {
+                clearInterval(pomodoroTimer);
+                pomodoroTimer = null;
+                timeRemaining = 0;
+                
+                elements.pomodoroStartBtn.classList.remove('hidden');
+                elements.pomodoroPauseBtn.classList.add('hidden');
+                elements.pomodoroStopBtn.classList.add('hidden');
+                elements.pomodoroSkipBtn.classList.add('hidden');
+                
+                elements.timerStatus.textContent = 'Ready';
+                elements.mainTimerDisplay.textContent = formatTime(pomodoroSettings.work * 60 * 1000);
+            };
+
+            const handleTimerEnd = async () => {
+                clearInterval(pomodoroTimer);
+                if (activeProject && pomodoroState === 'work') {
+                    const task = {
+                        projectId: activeProject.id,
+                        description: `Pomodoro session`,
+                        duration: pomodoroSettings.work * 60 * 1000,
+                        timestamp: Date.now()
+                    };
+                    await addData('tasks', task);
+                    await renderDashboardProjects();
+                    await updateCurrentMonthHours();
+                }
+
+                if (pomodoroState === 'work') {
+                    pomodoroCounts++;
+                    if (pomodoroCounts % 4 === 0) {
+                        startPomodoro(pomodoroSettings.longBreak, 'longBreak');
+                    } else {
+                        startPomodoro(pomodoroSettings.break, 'break');
+                    }
+                } else {
+                    startPomodoro(pomodoroSettings.work, 'work');
+                }
+            };
+            
+            const loadPomodoroSettings = async () => {
+                const settings = await getAllData('pomodoroSettings');
+                if (settings.length > 0) {
+                    pomodoroSettings = settings[0];
+                }
+                elements.workDurationInput.value = pomodoroSettings.work;
+                elements.breakDurationInput.value = pomodoroSettings.break;
+                elements.longBreakDurationInput.value = pomodoroSettings.longBreak;
+                elements.mainTimerDisplay.textContent = formatTime(pomodoroSettings.work * 60 * 1000);
             };
 
             // --- UI Rendering Functions ---
-
-            const renderClients = (clients) => {
-                elements.clientsList.innerHTML = clients.length === 0 
-                    ? '<p class="text-gray-500">No clients added yet.</p>'
-                    : clients.map(client => `
-                        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex justify-between items-center mb-2">
-                            <div>
-                                <h3 class="font-semibold text-gray-900">${client.name}</h3>
-                                <p class="text-sm text-gray-500">${client.details}</p>
-                            </div>
-                            <button class="delete-btn text-red-500 hover:text-red-700 font-bold p-2" data-id="${client.id}" data-type="client">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                        </div>
-                    `).join('');
-                
-                // Update client dropdown in projects form
-                elements.projectClientSelect.innerHTML = clients.length === 0 
-                    ? '<option value="">No clients available</option>'
-                    : '<option value="">Select a Client</option>' + clients.map(client => `
-                        <option value="${client.id}">${client.name}</option>
-                    `).join('');
+            const formatTime = (seconds) => {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
             };
-
-            const renderProjects = async () => {
-                projects = await getAllData('projects');
-                const projectsToRender = showingCompletedProjects ? projects : projects.filter(p => !p.isComplete);
-                
-                elements.toggleCompletedBtn.textContent = showingCompletedProjects ? 'View Active Projects' : 'View All Projects';
-
-                const projectsHTML = projectsToRender.map(project => {
-                    const client = clients.find(c => c.id === project.clientId);
-                    return `
-                        <div class="project-card bg-white p-6 rounded-xl shadow-md border-t-4 ${project.isComplete ? 'border-gray-400' : 'border-blue-500'} mb-6" data-project-id="${project.id}">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-2 sm:space-y-0">
-                                <div>
-                                    <h3 class="text-xl font-bold ${project.isComplete ? 'text-gray-600 line-through' : 'text-blue-800'}">${project.name}</h3>
-                                    <p class="text-sm text-gray-500">Client: ${client ? client.name : 'N/A'}</p>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    ${project.isComplete
-                                        ? `<button class="restore-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105 text-sm" data-id="${project.id}">Restore</button>`
-                                        : `<button class="complete-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105 text-sm" data-id="${project.id}">Complete</button>`
-                                    }
-                                    <button class="delete-btn text-red-500 hover:text-red-700 font-bold p-2" data-id="${project.id}" data-type="project">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <h4 class="font-semibold text-gray-700 text-lg mb-2">Tasks</h4>
-                            <div class="space-y-4" data-project-id="${project.id}">
-                                <!-- Tasks for this project will be rendered here -->
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                elements.projectsList.innerHTML = projectsToRender.length === 0
-                    ? `<p class="text-gray-500 text-center">No ${showingCompletedProjects ? 'completed' : 'active'} projects found.</p>`
-                    : projectsHTML;
-                
-                // Re-attach event listeners for dynamic content
-                projectsToRender.forEach(project => renderProjectTasks(project.id));
-            };
-
-            const renderDashboardProjects = async () => {
-                const activeProjects = projects.filter(p => !p.isComplete);
-                const allTasks = await getAllData('tasks');
-                
-                const dashboardHTML = await Promise.all(activeProjects.map(async (project) => {
-                    const client = clients.find(c => c.id === project.clientId);
-                    const clientName = client ? client.name : 'N/A';
-                    
-                    const isRunning = activeTimer && activeTimer.projectId === project.id;
-
-                    const latestTasks = allTasks
-                        .filter(task => task.projectId === project.id)
-                        .sort((a, b) => b.timestamp - a.timestamp)
-                        .slice(0, 2);
-
-                    const latestTasksHTML = latestTasks.map(task => `
-                        <p class="text-xs text-gray-500 truncate mt-1">${task.description} - ${formatTime(task.duration)}</p>
-                    `).join('');
-
-                    const timerContent = isRunning 
-                        ? `<div class="text-center">
-                                <p class="text-xl sm:text-2xl font-extrabold text-blue-600 timer-display" id="timer-display-${project.id}">00:00:00</p>
-                                <button class="stop-timer-btn p-3 bg-red-500 hover:bg-red-600 rounded-full shadow-lg transition-transform transform hover:scale-105" data-project-id="${project.id}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </div>`
-                        : `<form class="start-timer-form mt-4 space-y-2 flex-grow flex flex-col justify-end" data-project-id="${project.id}">
-                                <div>
-                                    <input type="text" placeholder="Task description" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-3 py-2">
-                                </div>
-                                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold p-3 rounded-md shadow transition-transform transform hover:scale-105">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M5 3l14 9-14 9V3z"></path>
-                                    </svg>
-                                </button>
-                            </form>`;
-                            
-                    return `
-                        <div class="bg-white p-4 rounded-xl shadow-md border-t-4 border-blue-500 flex flex-col justify-between aspect-square w-full">
-                            <div>
-                                <h3 class="font-bold text-lg text-blue-800">${project.name}</h3>
-                                <p class="text-sm text-gray-500">${clientName}</p>
-                            </div>
-                            <div class="flex-grow flex flex-col items-center justify-center">
-                                ${timerContent}
-                            </div>
-                            <div class="mt-2 pt-2 border-t border-gray-200">
-                                ${latestTasksHTML}
-                            </div>
-                        </div>
-                    `;
-                }));
-                
-                elements.dashboardProjectsList.innerHTML = dashboardHTML.join('') || '<p class="text-gray-500 text-center">No active projects to display. Please add one in the settings menu.</p>';
-
-                if (activeTimer) {
-                    clearInterval(timerInterval);
-                    timerInterval = setInterval(updateTimerDisplay, 1000);
-                }
-
-                // Update manual time form project options
-                projectsForManualTime = activeProjects.length === 0 
-                    ? '<option value="">No projects available</option>'
-                    : '<option value="">Select a Project</option>' + activeProjects.map(project => `
-                        <option value="${project.id}">${project.name}</option>
-                    `).join('');
-
-                elements.manualProjectSelect.innerHTML = projectsForManualTime;
-            };
-
-            const renderProjectTasks = async (projectId) => {
-                const allTasks = await getAllData('tasks');
-                const projectTasks = allTasks.filter(task => task.projectId === projectId);
-                const taskContainer = document.querySelector(`.project-card[data-project-id="${projectId}"] .space-y-4`);
-
-                if (!taskContainer) return;
-
-                const taskHTML = projectTasks.map(task => {
-                    const durationText = formatTime(task.duration);
-                    
-                    return `
-                        <div class="bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-200 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mb-2">
-                            <div class="flex-grow w-full">
-                                <p class="font-semibold text-gray-900 break-words">${task.description}</p>
-                                <p class="text-sm text-gray-500">Duration: ${durationText}</p>
-                                <p class="text-xs text-gray-400">Date: ${new Date(task.timestamp).toLocaleDateString()}</p>
-                            </div>
-                            <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-                                <button class="delete-task-btn text-red-500 hover:text-red-700 font-bold p-2" data-task-id="${task.id}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                taskContainer.innerHTML = taskHTML || '<p class="text-gray-500">No tasks logged yet.</p>';
-            };
-
-            const formatTime = (milliseconds) => {
-                const totalSeconds = Math.floor(milliseconds / 1000);
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            };
-
+            
             const updateTimerDisplay = () => {
-                if (activeTimer) {
-                    const elapsed = Date.now() - timerStartTime;
-                    const timerEl = document.getElementById(`timer-display-${activeTimer.projectId}`);
-                    if (timerEl) {
-                        timerEl.textContent = formatTime(elapsed);
-                    }
-                }
+                elements.mainTimerDisplay.textContent = formatTime(timeRemaining);
             };
 
             const updateCurrentMonthHours = async () => {
@@ -576,19 +472,164 @@
                 });
 
                 const totalTimeInHours = monthlyTasks.reduce((sum, task) => sum + (task.duration / 3600000), 0);
-                elements.currentMonthHours.textContent = totalTimeInHours.toFixed(2);
+                document.getElementById('current-month-hours').textContent = totalTimeInHours.toFixed(2);
+            };
+
+            const renderClients = (clients) => {
+                const clientListHTML = clients.length === 0 
+                    ? '<p class="text-gray-400">No clients added yet.</p>'
+                    : clients.map(client => `
+                        <div class="bg-gray-700 p-4 rounded-lg shadow-sm flex justify-between items-center mb-2 border border-gray-600">
+                            <div>
+                                <h3 class="font-semibold text-gray-50">${client.name}</h3>
+                                <p class="text-sm text-gray-400">${client.details}</p>
+                            </div>
+                            <button class="delete-btn text-red-400 hover:text-red-500 font-bold p-2" data-id="${client.id}" data-type="client">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                        </div>
+                    `).join('');
+                elements.clientsList.innerHTML = clientListHTML;
+
+                elements.projectClientSelect.innerHTML = clients.length === 0 
+                    ? '<option value="">No clients available</option>'
+                    : '<option value="">Select a Client</option>' + clients.map(client => `
+                        <option value="${client.id}">${client.name}</option>
+                    `).join('');
+            };
+
+            const renderProjectsInSettings = async () => {
+                const projectsToRender = showingCompletedProjects ? projects : projects.filter(p => !p.isComplete);
+                
+                elements.toggleCompletedBtn.textContent = showingCompletedProjects ? 'View Active Projects' : 'View All Projects';
+
+                const projectsHTML = projectsToRender.map(project => {
+                    const client = clients.find(c => c.id === project.clientId);
+                    return `
+                        <div class="project-card bg-gray-700 p-6 rounded-xl shadow-md border-t-4 ${project.isComplete ? 'border-gray-500' : 'border-blue-500'} mb-6 border border-gray-600">
+                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-2 sm:space-y-0">
+                                <div>
+                                    <h3 class="text-xl font-bold ${project.isComplete ? 'text-gray-400 line-through' : 'text-blue-400'}">${project.name}</h3>
+                                    <p class="text-sm text-gray-400">Client: ${client ? client.name : 'N/A'}</p>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    ${project.isComplete
+                                        ? `<button class="restore-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105 text-sm" data-id="${project.id}">Restore</button>`
+                                        : `<button class="complete-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105 text-sm" data-id="${project.id}">Complete</button>`
+                                    }
+                                    <button class="delete-btn text-red-400 hover:text-red-500 font-bold p-2" data-id="${project.id}" data-type="project">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <h4 class="font-semibold text-gray-400 text-lg mb-2">Tasks</h4>
+                            <div class="space-y-4" data-project-id="${project.id}">
+                                </div>
+                        </div>
+                    `;
+                }).join('');
+
+                elements.projectsList.innerHTML = projectsToRender.length === 0
+                    ? `<p class="text-gray-400 text-center">No ${showingCompletedProjects ? 'completed' : 'active'} projects found.</p>`
+                    : projectsHTML;
+                
+                projectsToRender.forEach(project => renderProjectTasks(project.id));
+            };
+
+            const renderDashboardProjects = async () => {
+                const activeProjects = projects.filter(p => !p.isComplete);
+                const allTasks = await getAllData('tasks');
+                
+                const dashboardHTML = await Promise.all(activeProjects.map(async (project) => {
+                    const client = clients.find(c => c.id === project.clientId);
+                    const clientName = client ? client.name : 'N/A';
+                    
+                    const isRunning = activeProject && activeProject.id === project.id;
+
+                    const latestTasks = allTasks
+                        .filter(task => task.projectId === project.id)
+                        .sort((a, b) => b.timestamp - a.timestamp)
+                        .slice(0, 2);
+
+                    const latestTasksHTML = latestTasks.map(task => `
+                        <p class="text-xs text-gray-500 truncate mt-1">${task.description} - ${formatTime(task.duration / 1000)}</p>
+                    `).join('');
+
+                    const timerContent = isRunning 
+                        ? `<div class="text-center">
+                                <p class="text-xl sm:text-2xl font-extrabold text-blue-400 timer-display" id="timer-display-${project.id}">00:00</p>
+                            </div>`
+                        : `<button class="start-timer-btn p-3 bg-blue-500 hover:bg-blue-600 rounded-full shadow-lg transition-transform transform hover:scale-105" data-project-id="${project.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M5 3l14 9-14 9V3z"></path>
+                                </svg>
+                            </button>`;
+                            
+                    return `
+                        <div class="bg-gray-700 p-4 rounded-xl shadow-md border-t-4 ${isRunning ? 'border-yellow-500' : 'border-gray-600'} flex flex-col justify-between aspect-square w-full border">
+                            <div>
+                                <h3 class="font-bold text-lg text-gray-50">${project.name}</h3>
+                                <p class="text-sm text-gray-400">${clientName}</p>
+                            </div>
+                            <div class="flex-grow flex flex-col items-center justify-center">
+                                ${timerContent}
+                                ${isRunning ? `<p class="text-gray-400 mt-2 text-sm">${activeProject.description}</p>` : ''}
+                            </div>
+                            <div class="mt-2 pt-2 border-t border-gray-600">
+                                ${latestTasksHTML}
+                            </div>
+                        </div>
+                    `;
+                }));
+                
+                elements.dashboardProjectsList.innerHTML = dashboardHTML.join('') || '<p class="text-gray-400 text-center">No active projects to display. Please add one in the settings menu.</p>';
+                if (pomodoroTimer) {
+                    updateTimerDisplay();
+                }
             };
             
-            // --- Event Handlers ---
+            const renderProjectTasks = async (projectId) => {
+                const allTasks = await getAllData('tasks');
+                const projectTasks = allTasks.filter(task => task.projectId === projectId);
+                const taskContainer = document.querySelector(`.project-card[data-project-id="${projectId}"] .space-y-4`);
 
+                if (!taskContainer) return;
+
+                const taskHTML = projectTasks.map(task => {
+                    const durationText = formatTime(task.duration / 1000);
+                    
+                    return `
+                        <div class="bg-gray-800 p-4 rounded-lg shadow-inner border border-gray-700 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mb-2">
+                            <div class="flex-grow w-full">
+                                <p class="font-semibold text-gray-50 break-words">${task.description}</p>
+                                <p class="text-sm text-gray-400">Duration: ${durationText}</p>
+                                <p class="text-xs text-gray-500">Date: ${new Date(task.timestamp).toLocaleDateString()}</p>
+                            </div>
+                            <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                                <button class="delete-task-btn text-red-400 hover:text-red-500 font-bold p-2" data-task-id="${task.id}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                taskContainer.innerHTML = taskHTML || '<p class="text-gray-400">No tasks logged yet.</p>';
+            };
+
+            // --- Event Handlers ---
             elements.openSettingsBtn.addEventListener('click', () => {
                 elements.settingsModal.classList.remove('hidden');
             });
             
             elements.closeSettingsBtn.addEventListener('click', () => {
                 elements.settingsModal.classList.add('hidden');
-                // Re-render dashboard to update status
-                loadAllData();
+                renderDashboardProjects();
             });
 
             elements.settingsTabButtons.forEach(button => {
@@ -600,6 +641,36 @@
                     document.getElementById(tabName).classList.remove('hidden');
                 });
             });
+
+            elements.pomodoroSettingsForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const newSettings = {
+                    id: 1,
+                    work: parseInt(elements.workDurationInput.value),
+                    break: parseInt(elements.breakDurationInput.value),
+                    longBreak: parseInt(elements.longBreakDurationInput.value),
+                };
+                if (newSettings.work < 1 || newSettings.break < 1 || newSettings.longBreak < 1) {
+                    showMessage("Durations must be at least 1 minute.");
+                    return;
+                }
+                await updateData('pomodoroSettings', newSettings);
+                pomodoroSettings = newSettings;
+                elements.mainTimerDisplay.textContent = formatTime(pomodoroSettings.work * 60);
+                showMessage("Settings saved successfully!");
+            });
+
+            elements.pomodoroStartBtn.addEventListener('click', () => {
+                if (!activeProject) {
+                    showMessage("Please select a project to start a session.");
+                    return;
+                }
+                startPomodoro(pomodoroSettings.work, 'work');
+            });
+
+            elements.pomodoroPauseBtn.addEventListener('click', pausePomodoro);
+            elements.pomodoroStopBtn.addEventListener('click', stopPomodoro);
+            elements.pomodoroSkipBtn.addEventListener('click', handleTimerEnd);
 
             elements.addClientForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -631,119 +702,9 @@
 
             elements.toggleCompletedBtn.addEventListener('click', async () => {
                 showingCompletedProjects = !showingCompletedProjects;
-                await renderProjects();
+                await renderProjectsInSettings();
             });
-
-            elements.manualTimeForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const projectId = parseInt(elements.manualProjectSelect.value);
-                const description = elements.manualTaskDescription.value;
-                const minutes = parseInt(elements.manualMinutes.value);
-
-                if (!projectId || !description || isNaN(minutes) || minutes <= 0) {
-                    showMessage('Please fill all fields for manual time entry.');
-                    return;
-                }
-                
-                const task = {
-                    projectId,
-                    description,
-                    duration: minutes * 60 * 1000,
-                    timestamp: Date.now()
-                };
-                await addData('tasks', task);
-                elements.manualTimeForm.reset();
-                showMessage('Manual time added successfully!');
-                updateCurrentMonthHours();
-            });
-
-            document.addEventListener('submit', async (e) => {
-                if (e.target.matches('.start-timer-form')) {
-                    e.preventDefault();
-                    if (activeTimer) {
-                        showMessage('A timer is already running. Please stop it first.');
-                        return;
-                    }
-                    const projectId = parseInt(e.target.closest('.start-timer-form').dataset.projectId);
-                    const description = e.target.closest('.start-timer-form').querySelector('input[type="text"]').value;
-
-                    if (!description) {
-                        showMessage('Please enter a task description.');
-                        return;
-                    }
-
-                    const project = projects.find(p => p.id === projectId);
-                    if (!project) return;
-                    
-                    activeTimer = {
-                        projectId,
-                        description,
-                        startTime: Date.now()
-                    };
-                    timerStartTime = activeTimer.startTime;
-                    renderDashboardProjects();
-                }
-            });
-
-            document.addEventListener('click', async (e) => {
-                if (e.target.closest('.delete-btn')) {
-                    const btn = e.target.closest('.delete-btn');
-                    const id = parseInt(btn.dataset.id);
-                    const type = btn.dataset.type;
-                    
-                    const confirmDelete = async () => {
-                        await deleteData(type + 's', id);
-                        await loadAllData();
-                        showMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully.`);
-                    };
-                    
-                    showAlert(`Are you sure you want to delete this ${type}?`, 'Confirm Deletion', 'confirm', confirmDelete);
-                }
-
-                if (e.target.closest('.delete-task-btn')) {
-                    const btn = e.target.closest('.delete-task-btn');
-                    const taskId = parseInt(btn.dataset.taskId);
-                    const projectId = parseInt(btn.closest('.project-card').dataset.projectId);
-                    await deleteData('tasks', taskId);
-                    await renderProjectTasks(projectId);
-                    showMessage('Task deleted successfully.');
-                }
-                
-                if (e.target.matches('.complete-btn') || e.target.matches('.restore-btn')) {
-                    const btn = e.target;
-                    const projectId = parseInt(btn.dataset.id);
-                    const projectToUpdate = projects.find(p => p.id === projectId);
-                    if (projectToUpdate) {
-                        projectToUpdate.isComplete = !projectToUpdate.isComplete;
-                        await updateData('projects', projectToUpdate);
-                        await renderProjects();
-                        showMessage(`Project ${projectToUpdate.isComplete ? 'completed' : 'restored'} successfully.`);
-                    }
-                }
-
-                if (e.target.matches('.stop-timer-btn') || e.target.closest('.stop-timer-btn')) {
-                    const btn = e.target.closest('.stop-timer-btn');
-                    const projectId = parseInt(btn.dataset.projectId);
-                    if (activeTimer && activeTimer.projectId === projectId) {
-                        const duration = Date.now() - activeTimer.startTime;
-                        const task = {
-                            projectId: activeTimer.projectId,
-                            description: activeTimer.description,
-                            duration,
-                            timestamp: Date.now()
-                        };
-                        
-                        await addData('tasks', task);
-                        showMessage('Time logged successfully!');
-                        clearInterval(timerInterval);
-                        activeTimer = null;
-                        renderDashboardProjects();
-                        renderProjectTasks(task.projectId);
-                        updateCurrentMonthHours();
-                    }
-                }
-            });
-
+            
             elements.reportForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const startDate = new Date(document.getElementById('report-start-date').value);
@@ -795,20 +756,20 @@
                     grandTotalTime += clientReport.totalTime;
                     
                     reportHTML += `
-                        <div class="bg-white p-6 rounded-xl shadow-md border-t-4 border-blue-500 mb-6">
-                            <h3 class="text-xl font-bold text-gray-800">${clientName}</h3>
-                            <p class="text-sm text-gray-500">Total Time: ${clientReport.totalTime.toFixed(2)} hours</p>
+                        <div class="bg-gray-700 p-6 rounded-xl shadow-md border-t-4 border-blue-500 mb-6 border border-gray-600">
+                            <h3 class="text-xl font-bold text-gray-50">${clientName}</h3>
+                            <p class="text-sm text-gray-400">Total Time: ${clientReport.totalTime.toFixed(2)} hours</p>
                             
                             <div class="mt-4 space-y-4">
                                 ${Object.keys(clientReport.projects).map(projectName => {
                                     const projectReport = clientReport.projects[projectName];
                                     return `
-                                        <div class="bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-200">
-                                            <h4 class="font-semibold text-gray-700">${projectName}</h4>
-                                            <p class="text-xs text-gray-500">Total Time: ${projectReport.totalTime.toFixed(2)} hours</p>
+                                        <div class="bg-gray-800 p-4 rounded-lg shadow-inner border border-gray-700">
+                                            <h4 class="font-semibold text-gray-50">${projectName}</h4>
+                                            <p class="text-xs text-gray-400">Total Time: ${projectReport.totalTime.toFixed(2)} hours</p>
                                             <div class="mt-2 text-sm space-y-1">
                                                 ${projectReport.tasks.map(task => `
-                                                    <div class="flex justify-between items-center text-gray-600">
+                                                    <div class="flex justify-between items-center text-gray-400">
                                                         <span>- ${task.description}:</span>
                                                         <span class="font-medium">${task.duration.toFixed(2)} hrs</span>
                                                     </div>
@@ -823,12 +784,12 @@
                 }
 
                 if (Object.keys(report).length === 0) {
-                    elements.reportOutput.innerHTML = '<p class="text-gray-500 text-center">No data found for this date range.</p>';
+                    elements.reportOutput.innerHTML = '<p class="text-gray-400 text-center">No data found for this date range.</p>';
                 } else {
                     elements.reportOutput.innerHTML = `
-                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow mb-6 text-center">
-                            <h3 class="text-2xl font-bold text-blue-800">Grand Total</h3>
-                            <p class="text-lg text-gray-600">Total Time: <span class="font-semibold">${grandTotalTime.toFixed(2)} hours</span></p>
+                        <div class="bg-blue-900 p-6 rounded-xl border border-blue-500 shadow mb-6 text-center">
+                            <h3 class="text-2xl font-bold text-blue-300">Grand Total</h3>
+                            <p class="text-lg text-gray-200">Total Time: <span class="font-semibold">${grandTotalTime.toFixed(2)} hours</span></p>
                         </div>
                         ${reportHTML}
                     `;
@@ -855,25 +816,21 @@
                     tasks: await getAllData('tasks')
                 };
                 const jsonString = JSON.stringify(allData, null, 2);
-                downloadFile(jsonString, 'time_tracker_data.json', 'application/json');
+                downloadFile(jsonString, 'pomodoro_tracker_data.json', 'application/json');
                 showMessage('Data exported as JSON successfully!');
             };
 
             const exportDataAsCSV = async () => {
-                // Get all data to join relationships
                 const allTasks = await getAllData('tasks');
                 const allProjects = await getAllData('projects');
                 const allClients = await getAllData('clients');
                 
-                // Create mappings for quick lookup
                 const projectsMap = new Map(allProjects.map(p => [p.id, p]));
                 const clientsMap = new Map(allClients.map(c => [c.id, c]));
 
-                // Define CSV header
                 const headers = ['Date', 'Project', 'Client', 'Task Description', 'Duration (mins)', 'Duration (hours)'];
                 let csvContent = headers.join(',') + '\n';
                 
-                // Populate CSV with task data
                 allTasks.forEach(task => {
                     const project = projectsMap.get(task.projectId);
                     const client = project ? clientsMap.get(project.clientId) : null;
@@ -881,7 +838,7 @@
                     const date = new Date(task.timestamp).toLocaleDateString();
                     const projectName = project ? project.name : 'N/A';
                     const clientName = client ? client.name : 'N/A';
-                    const description = task.description.replace(/,/g, ''); // Remove commas to prevent issues
+                    const description = task.description.replace(/,/g, '');
                     const durationMins = (task.duration / 60000).toFixed(2);
                     const durationHours = (task.duration / 3600000).toFixed(2);
 
@@ -889,7 +846,7 @@
                     csvContent += row.join(',') + '\n';
                 });
                 
-                downloadFile(csvContent, 'time_tracker_report.csv', 'text/csv');
+                downloadFile(csvContent, 'pomodoro_tracker_report.csv', 'text/csv');
                 showMessage('Time log exported as CSV successfully!');
             };
             
@@ -902,9 +859,11 @@
                 clients = await getAllData('clients');
                 projects = await getAllData('projects');
                 renderClients(clients);
-                renderProjects();
+                renderProjectsInSettings();
                 renderDashboardProjects();
                 updateCurrentMonthHours();
+                await loadPomodoroSettings();
+                stopPomodoro();
             };
 
             loadAllData().catch(err => {
@@ -913,6 +872,5 @@
             });
         });
     </script>
-
 </body>
 </html>
