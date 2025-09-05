@@ -46,40 +46,25 @@
 
         <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-900 mb-6">Time Tracker</h1>
 
-        <!-- Tab Navigation -->
-        <nav class="flex justify-center border-b border-gray-200 mb-8 overflow-x-auto whitespace-nowrap">
+        <!-- Main Navigation with settings button -->
+        <nav class="flex justify-between items-center border-b border-gray-200 mb-8">
             <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg active" data-tab="dashboard">Dashboard</button>
-            <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="projects">Projects & Tasks</button>
-            <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="clients">Clients</button>
-            <button class="tab-button px-4 py-3 sm:px-6 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="reports">Reports</button>
+            <button id="open-settings-btn" class="bg-gray-200 text-gray-700 font-semibold p-3 rounded-full hover:bg-gray-300 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+            </button>
         </nav>
-
+        
         <!-- Dashboard Section -->
         <section id="dashboard" class="tab-content">
-            <!-- Active Timer display moved to the top of the dashboard section for prominence -->
-            <div class="bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
-                <h2 class="text-2xl font-bold mb-4 text-center">Active Timer</h2>
-                <div id="active-timer-card" class="hidden text-center p-4 bg-white rounded-lg border border-blue-400">
-                    <p class="text-lg text-gray-600">
-                        <span id="timer-project-name" class="font-semibold text-blue-600"></span>
-                        <span class="mx-1 text-gray-400">/</span>
-                        <span id="timer-task-name" class="text-gray-500"></span>
-                    </p>
-                    <p id="timer-display" class="timer-display text-5xl sm:text-6xl font-extrabold text-gray-900 mt-2 mb-4">00:00:00</p>
-                    <button id="stop-timer-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                <div id="no-active-timer-card" class="text-center text-gray-500 p-4">
-                    <p class="text-lg">No active timer. Start one from your projects below!</p>
-                </div>
+            <div class="mb-8 p-4 rounded-xl bg-blue-50 border border-blue-200 text-blue-800">
+                <h3 class="text-xl font-bold">Current Month's Time</h3>
+                <p class="text-2xl font-semibold"><span id="current-month-hours">0.00</span> hours</p>
             </div>
             
             <h2 class="text-2xl font-bold mb-4">Your Active Projects</h2>
-            <div id="dashboard-projects-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div id="dashboard-projects-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <!-- Active Projects as small cards will be rendered here -->
             </div>
 
@@ -104,79 +89,97 @@
             
         </section>
 
-        <!-- Projects & Tasks Section -->
-        <section id="projects" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4">Add New Project</h2>
-            <form id="add-project-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
-                <div>
-                    <label for="project-name" class="block text-sm font-medium text-gray-700">Project Name</label>
-                    <input type="text" id="project-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                </div>
-                <div>
-                    <label for="project-client" class="block text-sm font-medium text-gray-700">Client</label>
-                    <select id="project-client" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></select>
-                </div>
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Project</button>
-            </form>
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden z-50 overflow-y-auto">
+            <div class="flex items-start justify-center min-h-screen pt-12">
+                <div class="bg-white p-6 sm:p-10 rounded-xl shadow-lg w-full max-w-4xl mx-4 my-8">
+                    <div class="flex justify-between items-center border-b pb-4 mb-6">
+                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Settings</h2>
+                        <button id="close-settings-btn" class="text-gray-500 hover:text-gray-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
 
-            <div class="mt-8 flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Your Projects</h2>
-                <button id="toggle-completed-btn" class="bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-md hover:bg-gray-300 transition-colors text-sm">View Completed Projects</button>
+                    <!-- Settings Tabs -->
+                    <div class="flex border-b border-gray-200 mb-6 overflow-x-auto whitespace-nowrap">
+                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg active" data-tab="project-management">Projects</button>
+                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="client-management">Clients</button>
+                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-600 border-b-2 border-transparent transition-all hover:text-blue-600 hover:border-blue-300 rounded-t-lg" data-tab="report-generation">Reports</button>
+                    </div>
+
+                    <!-- Project Management Tab -->
+                    <div id="project-management" class="settings-tab-content">
+                        <h3 class="text-xl font-bold mb-4">Add or Edit Project</h3>
+                        <form id="add-project-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
+                            <div>
+                                <label for="project-name" class="block text-sm font-medium text-gray-700">Project Name</label>
+                                <input type="text" id="project-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                            </div>
+                            <div>
+                                <label for="project-client" class="block text-sm font-medium text-gray-700">Client</label>
+                                <select id="project-client" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></select>
+                            </div>
+                            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Project</button>
+                        </form>
+                        
+                        <div class="mt-8 flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-bold">Your Projects</h3>
+                            <button id="toggle-completed-btn" class="bg-gray-200 text-gray-700 font-semibold px-4 py-2 rounded-md hover:bg-gray-300 transition-colors text-sm">View Completed Projects</button>
+                        </div>
+                        <div id="projects-list">
+                            <!-- Projects will be rendered here -->
+                        </div>
+                    </div>
+
+                    <!-- Client Management Tab -->
+                    <div id="client-management" class="settings-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4">Add New Client</h3>
+                        <form id="add-client-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner">
+                            <div>
+                                <label for="client-name" class="block text-sm font-medium text-gray-700">Client Name</label>
+                                <input type="text" id="client-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                            </div>
+                            <div>
+                                <label for="client-details" class="block text-sm font-medium text-gray-700">Details</label>
+                                <textarea id="client-details" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Client</button>
+                        </form>
+                        <div class="mt-8">
+                            <h3 class="text-xl font-bold mb-4">Your Clients</h3>
+                            <div id="clients-list">
+                                <!-- Clients will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report Generation Tab -->
+                    <div id="report-generation" class="settings-tab-content hidden">
+                        <h3 class="text-xl font-bold mb-4">Generate Report</h3>
+                        <form id="report-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
+                            <div>
+                                <label for="report-start-date" class="block text-sm font-medium text-gray-700">Start Date</label>
+                                <input type="date" id="report-start-date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                            </div>
+                            <div>
+                                <label for="report-end-date" class="block text-sm font-medium text-gray-700">End Date</label>
+                                <input type="date" id="report-end-date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                            </div>
+                            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Generate Report</button>
+                        </form>
+                        <div id="report-output">
+                            <!-- Report will be displayed here -->
+                        </div>
+                        <div class="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                            <button id="export-json-btn" class="w-full sm:w-1/2 bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export All Data as JSON</button>
+                            <button id="export-csv-btn" class="w-full sm:w-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export Time Log as CSV</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="projects-list">
-                <!-- Projects will be rendered here -->
-            </div>
-        </section>
-
-        <!-- Clients Section -->
-        <section id="clients" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4">Add New Client</h2>
-            <form id="add-client-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner">
-                <div>
-                    <label for="client-name" class="block text-sm font-medium text-gray-700">Client Name</label>
-                    <input type="text" id="client-name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                </div>
-                <div>
-                    <label for="client-details" class="block text-sm font-medium text-gray-700">Details</label>
-                    <textarea id="client-details" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2"></textarea>
-                </div>
-                <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Client</button>
-            </form>
-
-            <div class="mt-8">
-                <h2 class="text-xl font-bold mb-4">Your Clients</h2>
-                <div id="clients-list">
-                    <!-- Clients will be rendered here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Reports Section -->
-        <section id="reports" class="tab-content hidden">
-            <h2 class="text-2xl font-bold mb-4">Generate Report</h2>
-            <form id="report-form" class="space-y-4 bg-gray-50 p-6 rounded-xl shadow-inner mb-8">
-                <div>
-                    <label for="report-start-date" class="block text-sm font-medium text-gray-700">Start Date</label>
-                    <input type="date" id="report-start-date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                </div>
-                <div>
-                    <label for="report-end-date" class="block text-sm font-medium text-gray-700">End Date</label>
-                    <input type="date" id="report-end-date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                </div>
-                <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Generate Report</button>
-            </form>
-
-            <div id="report-output">
-                <!-- Report will be displayed here -->
-            </div>
-
-            ---
-
-            <div class="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                <button id="export-json-btn" class="w-full sm:w-1/2 bg-gray-800 hover:bg-gray-900 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export All Data as JSON</button>
-                <button id="export-csv-btn" class="w-full sm:w-1/2 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export Time Log as CSV</button>
-            </div>
-        </section>
+        </div>
         
         <!-- Modal for Alerts -->
         <div id="modal-backdrop" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden transition-opacity z-50"></div>
@@ -255,7 +258,7 @@
 
             // --- IndexedDB Database Operations ---
             const DB_NAME = 'timeTrackerDB';
-            const DB_VERSION = 2; // Increased version for schema change
+            const DB_VERSION = 2;
             let db;
 
             const openDB = () => {
@@ -338,34 +341,32 @@
             let projects = [];
             let activeTimer = null;
             let timerInterval = null;
-            let timerStartTime = 0;
-            let showingCompletedProjects = false; // State to track which projects to show
+            let showingCompletedProjects = false;
+            let projectsForManualTime = [];
 
             const elements = {
-                // Tabs
-                tabButtons: document.querySelectorAll('.tab-button'),
-                tabContents: document.querySelectorAll('.tab-content'),
-                // Dashboard
+                // Main UI
                 dashboardProjectsList: document.getElementById('dashboard-projects-list'),
-                activeTimerCard: document.getElementById('active-timer-card'),
-                noActiveTimerCard: document.getElementById('no-active-timer-card'),
-                timerProjectName: document.getElementById('timer-project-name'),
-                timerTaskName: document.getElementById('timer-task-name'),
-                timerDisplay: document.getElementById('timer-display'),
-                stopTimerBtn: document.getElementById('stop-timer-btn'),
+                openSettingsBtn: document.getElementById('open-settings-btn'),
+                currentMonthHours: document.getElementById('current-month-hours'),
                 manualTimeForm: document.getElementById('manual-time-form'),
                 manualProjectSelect: document.getElementById('manual-project-select'),
                 manualTaskDescription: document.getElementById('manual-task-description'),
                 manualMinutes: document.getElementById('manual-minutes'),
-                // Projects
+                // Settings Modal
+                settingsModal: document.getElementById('settings-modal'),
+                closeSettingsBtn: document.getElementById('close-settings-btn'),
+                settingsTabButtons: document.querySelectorAll('.settings-tab-button'),
+                settingsTabContents: document.querySelectorAll('.settings-tab-content'),
+                // Project Management Tab
                 addProjectForm: document.getElementById('add-project-form'),
                 projectsList: document.getElementById('projects-list'),
                 projectClientSelect: document.getElementById('project-client'),
                 toggleCompletedBtn: document.getElementById('toggle-completed-btn'),
-                // Clients
+                // Client Management Tab
                 addClientForm: document.getElementById('add-client-form'),
                 clientsList: document.getElementById('clients-list'),
-                // Reports
+                // Report Generation Tab
                 reportForm: document.getElementById('report-form'),
                 reportOutput: document.getElementById('report-output'),
                 exportJsonBtn: document.getElementById('export-json-btn'),
@@ -401,14 +402,14 @@
 
             const renderProjects = async () => {
                 projects = await getAllData('projects');
-                const projectsToRender = showingCompletedProjects ? projects.filter(p => p.isComplete) : projects.filter(p => !p.isComplete);
+                const projectsToRender = showingCompletedProjects ? projects : projects.filter(p => !p.isComplete);
                 
-                elements.toggleCompletedBtn.textContent = showingCompletedProjects ? 'View Active Projects' : 'View Completed Projects';
+                elements.toggleCompletedBtn.textContent = showingCompletedProjects ? 'View Active Projects' : 'View All Projects';
 
                 const projectsHTML = projectsToRender.map(project => {
                     const client = clients.find(c => c.id === project.clientId);
                     return `
-                        <div class="project-card bg-white p-6 rounded-xl shadow-md border-t-4 ${project.isComplete ? 'border-gray-400' : 'border-blue-500'} mb-6">
+                        <div class="project-card bg-white p-6 rounded-xl shadow-md border-t-4 ${project.isComplete ? 'border-gray-400' : 'border-blue-500'} mb-6" data-project-id="${project.id}">
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-2 sm:space-y-0">
                                 <div>
                                     <h3 class="text-xl font-bold ${project.isComplete ? 'text-gray-600 line-through' : 'text-blue-800'}">${project.name}</h3>
@@ -426,12 +427,10 @@
                                     </button>
                                 </div>
                             </div>
-                            ${!project.isComplete ? `
                             <h4 class="font-semibold text-gray-700 text-lg mb-2">Tasks</h4>
                             <div class="space-y-4" data-project-id="${project.id}">
                                 <!-- Tasks for this project will be rendered here -->
                             </div>
-                            ` : ''}
                         </div>
                     `;
                 }).join('');
@@ -440,29 +439,40 @@
                     ? `<p class="text-gray-500 text-center">No ${showingCompletedProjects ? 'completed' : 'active'} projects found.</p>`
                     : projectsHTML;
                 
-                // Render dashboard projects only if not showing completed projects
-                if (!showingCompletedProjects) {
-                    renderDashboardProjects();
-                } else {
-                    elements.dashboardProjectsList.innerHTML = '';
-                }
-                
                 // Re-attach event listeners for dynamic content
                 projectsToRender.forEach(project => renderProjectTasks(project.id));
             };
 
-            const renderDashboardProjects = () => {
+            const renderDashboardProjects = async () => {
                 const activeProjects = projects.filter(p => !p.isComplete);
-                const dashboardHTML = activeProjects.map(project => {
+                const allTasks = await getAllData('tasks');
+                
+                const dashboardHTML = await Promise.all(activeProjects.map(async (project) => {
                     const client = clients.find(c => c.id === project.clientId);
                     const clientName = client ? client.name : 'N/A';
-                    return `
-                        <div class="bg-white p-4 rounded-xl shadow-md border-t-4 border-blue-500 flex flex-col justify-between aspect-square w-full">
-                            <div>
-                                <h3 class="font-bold text-lg text-blue-800">${project.name}</h3>
-                                <p class="text-sm text-gray-500">${clientName}</p>
-                            </div>
-                            <form class="start-timer-form mt-4 space-y-2 flex-grow flex flex-col justify-end">
+                    
+                    const isRunning = activeTimer && activeTimer.projectId === project.id;
+
+                    const latestTasks = allTasks
+                        .filter(task => task.projectId === project.id)
+                        .sort((a, b) => b.timestamp - a.timestamp)
+                        .slice(0, 2);
+
+                    const latestTasksHTML = latestTasks.map(task => `
+                        <p class="text-xs text-gray-500 truncate mt-1">${task.description} - ${formatTime(task.duration)}</p>
+                    `).join('');
+
+                    const timerContent = isRunning 
+                        ? `<div class="text-center">
+                                <p class="text-xl sm:text-2xl font-extrabold text-blue-600 timer-display" id="timer-display-${project.id}">00:00:00</p>
+                                <button class="stop-timer-btn p-3 bg-red-500 hover:bg-red-600 rounded-full shadow-lg transition-transform transform hover:scale-105" data-project-id="${project.id}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>`
+                        : `<form class="start-timer-form mt-4 space-y-2 flex-grow flex flex-col justify-end" data-project-id="${project.id}">
                                 <div>
                                     <input type="text" placeholder="Task description" required class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-3 py-2">
                                 </div>
@@ -471,24 +481,45 @@
                                         <path d="M5 3l14 9-14 9V3z"></path>
                                     </svg>
                                 </button>
-                            </form>
+                            </form>`;
+                            
+                    return `
+                        <div class="bg-white p-4 rounded-xl shadow-md border-t-4 border-blue-500 flex flex-col justify-between aspect-square w-full">
+                            <div>
+                                <h3 class="font-bold text-lg text-blue-800">${project.name}</h3>
+                                <p class="text-sm text-gray-500">${clientName}</p>
+                            </div>
+                            <div class="flex-grow flex flex-col items-center justify-center">
+                                ${timerContent}
+                            </div>
+                            <div class="mt-2 pt-2 border-t border-gray-200">
+                                ${latestTasksHTML}
+                            </div>
                         </div>
                     `;
-                }).join('');
-                elements.dashboardProjectsList.innerHTML = dashboardHTML || '<p class="text-gray-500 text-center">No active projects to display. Please add one in the "Projects & Tasks" tab.</p>';
+                }));
+                
+                elements.dashboardProjectsList.innerHTML = dashboardHTML.join('') || '<p class="text-gray-500 text-center">No active projects to display. Please add one in the settings menu.</p>';
+
+                if (activeTimer) {
+                    clearInterval(timerInterval);
+                    timerInterval = setInterval(updateTimerDisplay, 1000);
+                }
 
                 // Update manual time form project options
-                elements.manualProjectSelect.innerHTML = activeProjects.length === 0 
+                projectsForManualTime = activeProjects.length === 0 
                     ? '<option value="">No projects available</option>'
                     : '<option value="">Select a Project</option>' + activeProjects.map(project => `
                         <option value="${project.id}">${project.name}</option>
                     `).join('');
+
+                elements.manualProjectSelect.innerHTML = projectsForManualTime;
             };
 
             const renderProjectTasks = async (projectId) => {
                 const allTasks = await getAllData('tasks');
                 const projectTasks = allTasks.filter(task => task.projectId === projectId);
-                const taskContainer = document.querySelector(`.project-card [data-project-id="${projectId}"]`);
+                const taskContainer = document.querySelector(`.project-card[data-project-id="${projectId}"] .space-y-4`);
 
                 if (!taskContainer) return;
 
@@ -526,18 +557,46 @@
             const updateTimerDisplay = () => {
                 if (activeTimer) {
                     const elapsed = Date.now() - timerStartTime;
-                    elements.timerDisplay.textContent = formatTime(elapsed);
+                    const timerEl = document.getElementById(`timer-display-${activeTimer.projectId}`);
+                    if (timerEl) {
+                        timerEl.textContent = formatTime(elapsed);
+                    }
                 }
+            };
+
+            const updateCurrentMonthHours = async () => {
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+
+                const allTasks = await getAllData('tasks');
+                const monthlyTasks = allTasks.filter(task => {
+                    const taskDate = new Date(task.timestamp);
+                    return taskDate >= startOfMonth && taskDate <= endOfMonth;
+                });
+
+                const totalTimeInHours = monthlyTasks.reduce((sum, task) => sum + (task.duration / 3600000), 0);
+                elements.currentMonthHours.textContent = totalTimeInHours.toFixed(2);
             };
             
             // --- Event Handlers ---
 
-            elements.tabButtons.forEach(button => {
+            elements.openSettingsBtn.addEventListener('click', () => {
+                elements.settingsModal.classList.remove('hidden');
+            });
+            
+            elements.closeSettingsBtn.addEventListener('click', () => {
+                elements.settingsModal.classList.add('hidden');
+                // Re-render dashboard to update status
+                loadAllData();
+            });
+
+            elements.settingsTabButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
                     const tabName = e.target.dataset.tab;
-                    elements.tabButtons.forEach(btn => btn.classList.remove('active'));
+                    elements.settingsTabButtons.forEach(btn => btn.classList.remove('active'));
                     e.target.classList.add('active');
-                    elements.tabContents.forEach(content => content.classList.add('hidden'));
+                    elements.settingsTabContents.forEach(content => content.classList.add('hidden'));
                     document.getElementById(tabName).classList.remove('hidden');
                 });
             });
@@ -595,6 +654,7 @@
                 await addData('tasks', task);
                 elements.manualTimeForm.reset();
                 showMessage('Manual time added successfully!');
+                updateCurrentMonthHours();
             });
 
             document.addEventListener('submit', async (e) => {
@@ -621,13 +681,7 @@
                         startTime: Date.now()
                     };
                     timerStartTime = activeTimer.startTime;
-                    timerInterval = setInterval(updateTimerDisplay, 1000);
-                    
-                    elements.timerProjectName.textContent = project.name;
-                    elements.timerTaskName.textContent = description;
-                    elements.noActiveTimerCard.classList.add('hidden');
-                    elements.activeTimerCard.classList.remove('hidden');
-                    elements.timerDisplay.textContent = '00:00:00';
+                    renderDashboardProjects();
                 }
             });
 
@@ -662,13 +716,15 @@
                     if (projectToUpdate) {
                         projectToUpdate.isComplete = !projectToUpdate.isComplete;
                         await updateData('projects', projectToUpdate);
-                        await renderProjects(); // Re-render the project list
+                        await renderProjects();
                         showMessage(`Project ${projectToUpdate.isComplete ? 'completed' : 'restored'} successfully.`);
                     }
                 }
 
-                if (e.target.matches('#stop-timer-btn') || e.target.closest('#stop-timer-btn')) {
-                    if (activeTimer) {
+                if (e.target.matches('.stop-timer-btn') || e.target.closest('.stop-timer-btn')) {
+                    const btn = e.target.closest('.stop-timer-btn');
+                    const projectId = parseInt(btn.dataset.projectId);
+                    if (activeTimer && activeTimer.projectId === projectId) {
                         const duration = Date.now() - activeTimer.startTime;
                         const task = {
                             projectId: activeTimer.projectId,
@@ -677,14 +733,13 @@
                             timestamp: Date.now()
                         };
                         
-                        addData('tasks', task).then(() => {
-                            showMessage('Time logged successfully!');
-                            clearInterval(timerInterval);
-                            activeTimer = null;
-                            elements.activeTimerCard.classList.add('hidden');
-                            elements.noActiveTimerCard.classList.remove('hidden');
-                            renderProjectTasks(task.projectId);
-                        });
+                        await addData('tasks', task);
+                        showMessage('Time logged successfully!');
+                        clearInterval(timerInterval);
+                        activeTimer = null;
+                        renderDashboardProjects();
+                        renderProjectTasks(task.projectId);
+                        updateCurrentMonthHours();
                     }
                 }
             });
@@ -848,6 +903,8 @@
                 projects = await getAllData('projects');
                 renderClients(clients);
                 renderProjects();
+                renderDashboardProjects();
+                updateCurrentMonthHours();
             };
 
             loadAllData().catch(err => {
