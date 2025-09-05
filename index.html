@@ -7,12 +7,13 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Inter Font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <style>
         body {
             font-family: 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            background: #111827;
         }
         /* Custom scrollbar for better visual appeal */
         ::-webkit-scrollbar {
@@ -33,202 +34,207 @@
         }
         .timer-display {
             font-variant-numeric: tabular-nums;
+            font-weight: 800;
+        }
+        .project-card {
+            transition: all 0.2s ease-in-out;
+            transform: scale(1);
+        }
+        .project-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+        }
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
         }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen p-4 sm:p-8">
 
-    <div class="container mx-auto bg-gray-800 p-6 sm:p-10 rounded-xl shadow-lg border border-gray-700">
-
-        <header class="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-50 text-center">Time Tracker</h1>
-            <button id="open-settings-btn" class="bg-gray-700 text-gray-300 font-semibold p-3 rounded-full hover:bg-gray-600 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                </svg>
-            </button>
+    <div class="container mx-auto">
+        <!-- Navigation at the top -->
+        <header class="flex justify-between items-center mb-6 pb-4">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-50">Time Tracker</h1>
+            <div class="flex space-x-4">
+                <button id="dashboard-btn" class="px-4 py-2 font-semibold text-gray-300 rounded-lg hover:bg-gray-700 transition-colors active bg-gray-700">Dashboard</button>
+                <button id="settings-btn" class="px-4 py-2 font-semibold text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">Settings</button>
+            </div>
         </header>
 
         <!-- Dashboard Section -->
-        <section id="dashboard">
-            <div class="mb-8 p-4 rounded-xl bg-gray-700 border border-gray-600 text-gray-50">
-                <h3 class="text-xl font-bold">Current Month's Time</h3>
-                <p class="text-2xl font-semibold"><span id="current-month-hours">0.00</span> hours</p>
+        <section id="dashboard" class="block">
+            <div class="mb-8 p-4 rounded-xl bg-gray-800 border border-gray-700 text-gray-50 shadow-lg flex justify-between items-center">
+                <div class="flex flex-col">
+                    <h3 class="text-xl font-bold">Current Month's Time</h3>
+                    <p class="text-2xl font-semibold"><span id="current-month-hours">0.00</span> hours</p>
+                </div>
+                <div class="flex flex-col items-end">
+                    <h3 class="text-xl font-bold">Current Time</h3>
+                    <p class="text-2xl font-semibold timer-display" id="current-time">00:00:00</p>
+                </div>
             </div>
             
-            <h2 class="text-2xl font-bold mb-4">Your Active Projects</h2>
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">Your Active Projects</h2>
+                <button id="add-project-button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Add Project
+                </button>
+            </div>
+            
             <div id="dashboard-projects-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
                 <!-- Project cards will be rendered here -->
             </div>
-
         </section>
 
-        <!-- Settings Modal -->
-        <div id="settings-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden z-50 overflow-y-auto">
-            <div class="flex items-start justify-center min-h-screen pt-12">
-                <div class="bg-gray-800 p-6 sm:p-10 rounded-xl shadow-lg w-full max-w-4xl mx-4 my-8 border border-gray-700">
-                    <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
-                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-50">Settings</h2>
-                        <button id="close-settings-btn" class="text-gray-400 hover:text-gray-50 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </div>
+        <!-- Settings Section -->
+        <section id="settings-section" class="hidden">
+            <div class="bg-gray-800 p-6 sm:p-10 rounded-xl shadow-lg w-full border border-gray-700">
+                <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-50">Settings</h2>
+                </div>
 
-                    <!-- Settings Tabs -->
-                    <div class="flex border-b border-gray-700 mb-6 overflow-x-auto whitespace-nowrap">
-                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg active" data-tab="add-project">Add Project</button>
-                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="project-management">Projects List</button>
-                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="manual-time">Manual Time</button>
-                        <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="report-generation">Reports</button>
-                    </div>
+                <!-- Settings Tabs -->
+                <div class="flex border-b border-gray-700 mb-6 overflow-x-auto whitespace-nowrap">
+                    <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg active" data-tab="add-project">Add Project</button>
+                    <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="project-management">Projects List</button>
+                    <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="manual-time">Manual Time</button>
+                    <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="report-generation">Reports</button>
+                </div>
 
-                    <!-- Add Project Tab -->
-                    <div id="add-project" class="settings-tab-content">
-                        <h3 class="text-xl font-bold mb-4">Add New Project</h3>
-                        <form id="add-project-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mb-8">
-                            <div>
-                                <label for="project-name" class="block text-sm font-medium text-gray-400">Project Name</label>
-                                <input type="text" id="project-name" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                            </div>
-                            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Project</button>
-                        </form>
-                    </div>
-
-                    <!-- Project Management Tab -->
-                    <div id="project-management" class="settings-tab-content hidden">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-bold">Your Projects</h3>
-                            <button id="toggle-completed-btn" class="bg-gray-700 text-gray-300 font-semibold px-4 py-2 rounded-md hover:bg-gray-600 transition-colors text-sm">View Completed Projects</button>
+                <!-- Add Project Tab -->
+                <div id="add-project" class="settings-tab-content">
+                    <h3 class="text-xl font-bold mb-4">Add New Project</h3>
+                    <form id="add-project-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mb-8 border border-gray-700">
+                        <div>
+                            <label for="project-name" class="block text-sm font-medium text-gray-400">Project Name</label>
+                            <input type="text" id="project-name" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
                         </div>
-                        <div id="projects-list">
-                            <!-- Projects will be rendered here -->
-                        </div>
-                    </div>
+                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Project</button>
+                    </form>
+                </div>
 
-                    <!-- Manual Time Tab -->
-                    <div id="manual-time" class="settings-tab-content hidden">
-                        <h3 class="text-xl font-bold mb-4">Add Manual Time</h3>
-                        <form id="manual-time-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mt-8">
-                            <div>
-                                <label for="manual-project-select" class="block text-sm font-medium text-gray-400">Project</label>
-                                <select id="manual-project-select" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2"></select>
-                            </div>
-                            <div>
-                                <label for="manual-task-description" class="block text-sm font-medium text-gray-400">Task Description</label>
-                                <input type="text" id="manual-task-description" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
-                            </div>
-                            <div>
-                                <label for="manual-minutes" class="block text-sm font-medium text-gray-400">Minutes Spent</label>
-                                <input type="number" id="manual-minutes" min="1" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
-                            </div>
-                            <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Time</button>
-                        </form>
+                <!-- Project Management Tab -->
+                <div id="project-management" class="settings-tab-content hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold">Your Projects</h3>
+                        <button id="toggle-completed-btn" class="bg-gray-700 text-gray-300 font-semibold px-4 py-2 rounded-md hover:bg-gray-600 transition-colors text-sm">View Completed Projects</button>
                     </div>
+                    <div id="projects-list">
+                        <!-- Projects will be rendered here -->
+                    </div>
+                </div>
 
-                    <!-- Report Generation Tab -->
-                    <div id="report-generation" class="settings-tab-content hidden">
-                        <h3 class="text-xl font-bold mb-4">Generate Report</h3>
-                        <form id="report-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mb-8">
-                            <div>
-                                <label for="report-start-date" class="block text-sm font-medium text-gray-400">Start Date</label>
-                                <input type="date" id="report-start-date" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                            </div>
-                            <div>
-                                <label for="report-end-date" class="block text-sm font-medium text-gray-400">End Date</label>
-                                <input type="date" id="report-end-date" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                            </div>
-                            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Generate Report</button>
-                        </form>
-                        <div id="report-output">
-                            <!-- Report will be displayed here -->
+                <!-- Manual Time Tab -->
+                <div id="manual-time" class="settings-tab-content hidden">
+                    <h3 class="text-xl font-bold mb-4">Add Manual Time</h3>
+                    <form id="manual-time-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mt-8 border border-gray-700">
+                        <div>
+                            <label for="manual-project-select" class="block text-sm font-medium text-gray-400">Project</label>
+                            <select id="manual-project-select" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2"></select>
                         </div>
-                        <div class="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                            <button id="export-json-btn" class="w-full sm:w-1/2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export All Data as JSON</button>
-                            <button id="export-csv-btn" class="w-full sm:w-1/2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export Time Log as CSV</button>
+                        <div>
+                            <label for="manual-task-description" class="block text-sm font-medium text-gray-400">Task Description</label>
+                            <input type="text" id="manual-task-description" class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
                         </div>
+                        <div>
+                            <label for="manual-minutes" class="block text-sm font-medium text-gray-400">Minutes Spent</label>
+                            <input type="number" id="manual-minutes" min="1" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
+                        </div>
+                        <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Time</button>
+                    </form>
+                </div>
+
+                <!-- Report Generation Tab -->
+                <div id="report-generation" class="settings-tab-content hidden">
+                    <h3 class="text-xl font-bold mb-4">Generate Report</h3>
+                    <form id="report-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mb-8 border border-gray-700">
+                        <div>
+                            <label for="report-start-date" class="block text-sm font-medium text-gray-400">Start Date</label>
+                            <input type="date" id="report-start-date" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                        </div>
+                        <div>
+                            <label for="report-end-date" class="block text-sm font-medium text-gray-400">End Date</label>
+                            <input type="date" id="report-end-date" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
+                        </div>
+                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Generate Report</button>
+                    </form>
+                    <div id="report-output">
+                        <!-- Report will be displayed here -->
+                    </div>
+                    <div class="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button id="export-json-btn" class="w-full sm:w-1/2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export All Data as JSON</button>
+                        <button id="export-csv-btn" class="w-full sm:w-1/2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export Time Log as CSV</button>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Modal for Alerts -->
-        <div id="modal-backdrop" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden transition-opacity z-50"></div>
-        <div id="modal-container" class="fixed inset-0 flex items-center justify-center p-4 hidden z-50">
-            <div id="modal" class="bg-gray-800 p-6 rounded-lg shadow-2xl max-w-sm w-full transform transition-all scale-95 opacity-0 border border-gray-700">
-                <div class="text-lg font-semibold text-gray-50 mb-4" id="modal-title"></div>
-                <div class="text-sm text-gray-400 mb-6" id="modal-message"></div>
-                <div class="flex justify-end space-x-2">
-                    <button id="modal-confirm-btn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">OK</button>
-                    <button id="modal-cancel-btn" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors">Cancel</button>
-                </div>
-            </div>
-        </div>
+        </section>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // --- Modal/Alert Functionality ---
-            const modalBackdrop = document.getElementById('modal-backdrop');
-            const modalContainer = document.getElementById('modal-container');
-            const modalTitle = document.getElementById('modal-title');
-            const modalMessage = document.getElementById('modal-message');
-            const modalConfirmBtn = document.getElementById('modal-confirm-btn');
-            const modalCancelBtn = document.getElementById('modal-cancel-btn');
+            // --- Global Variables ---
+            let projects = [];
+            let activeTimer = null;
+            let timerInterval = null;
+            let showingCompletedProjects = false;
+            
+            const projectColors = ['#F9A825', '#EF4444', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F97316', '#6366F1'];
+            let colorIndex = 0;
 
-            function showAlert(message, title = 'Alert', type = 'alert', onConfirm = () => {}, onCancel = () => {}) {
-                modalTitle.textContent = title;
-                modalMessage.textContent = message;
-                modalBackdrop.classList.remove('hidden');
-                modalContainer.classList.remove('hidden');
-                modal.classList.add('scale-100', 'opacity-100');
-                modal.classList.remove('scale-95', 'opacity-0');
+            const elements = {
+                // Main UI
+                dashboardProjectsList: document.getElementById('dashboard-projects-list'),
+                dashboardBtn: document.getElementById('dashboard-btn'),
+                settingsBtn: document.getElementById('settings-btn'),
+                dashboardSection: document.getElementById('dashboard'),
+                settingsSection: document.getElementById('settings-section'),
+                addProjectButton: document.getElementById('add-project-button'),
+                currentMonthHours: document.getElementById('current-month-hours'),
+                currentTimeDisplay: document.getElementById('current-time'),
+                // Settings Modal
+                settingsTabButtons: document.querySelectorAll('.settings-tab-button'),
+                settingsTabContents: document.querySelectorAll('.settings-tab-content'),
+                // Add Project Tab
+                addProjectForm: document.getElementById('add-project-form'),
+                // Project Management Tab
+                projectsList: document.getElementById('projects-list'),
+                toggleCompletedBtn: document.getElementById('toggle-completed-btn'),
+                // Manual Time Tab
+                manualTimeForm: document.getElementById('manual-time-form'),
+                manualProjectSelect: document.getElementById('manual-project-select'),
+                manualTaskDescription: document.getElementById('manual-task-description'),
+                manualMinutes: document.getElementById('manual-minutes'),
+                // Report Generation Tab
+                reportForm: document.getElementById('report-form'),
+                reportOutput: document.getElementById('report-output'),
+                exportJsonBtn: document.getElementById('export-json-btn'),
+                exportCsvBtn: document.getElementById('export-csv-btn'),
+            };
+            
+            // --- Helper Functions ---
+            const formatTime = (milliseconds) => {
+                const totalSeconds = Math.floor(milliseconds / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            };
 
-                if (type === 'confirm') {
-                    modalConfirmBtn.classList.remove('hidden');
-                    modalCancelBtn.classList.remove('hidden');
-                } else {
-                    modalConfirmBtn.classList.add('hidden');
-                    modalCancelBtn.classList.add('hidden');
-                }
-
-                modalConfirmBtn.onclick = () => {
-                    onConfirm();
-                    closeModal();
-                };
-                modalCancelBtn.onclick = () => {
-                    onCancel();
-                    closeModal();
-                };
-            }
-
-            function closeModal() {
-                modal.classList.remove('scale-100', 'opacity-100');
-                modal.classList.add('scale-95', 'opacity-0');
-                setTimeout(() => {
-                    modalBackdrop.classList.add('hidden');
-                    modalContainer.classList.add('hidden');
-                }, 300);
-            }
-
-            function showMessage(message, title = 'Notification') {
-                modalTitle.textContent = title;
-                modalMessage.textContent = message;
-                modalConfirmBtn.textContent = 'OK';
-                modalConfirmBtn.classList.remove('hidden');
-                modalCancelBtn.classList.add('hidden');
-                modalBackdrop.classList.remove('hidden');
-                modalContainer.classList.remove('hidden');
-                modal.classList.add('scale-100', 'opacity-100');
-                modal.classList.remove('scale-95', 'opacity-0');
-                modalConfirmBtn.onclick = closeModal;
-            }
-
+            const formatCurrentTime = () => {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                elements.currentTimeDisplay.textContent = `${hours}:${minutes}:${seconds}`;
+            };
+            
             // --- IndexedDB Database Operations ---
             const DB_NAME = 'timeTrackerDB';
-            const DB_VERSION = 5; // Increment to trigger upgrade
+            const DB_VERSION = 7;
             let db;
 
             const openDB = () => {
@@ -238,7 +244,8 @@
                     request.onupgradeneeded = (event) => {
                         db = event.target.result;
                         if (!db.objectStoreNames.contains('projects')) {
-                            db.createObjectStore('projects', { keyPath: 'id', autoIncrement: true });
+                            const projectsStore = db.createObjectStore('projects', { keyPath: 'id', autoIncrement: true });
+                            projectsStore.createIndex('color', 'color', { unique: false });
                         }
                         if (!db.objectStoreNames.contains('tasks')) {
                             const tasksStore = db.createObjectStore('tasks', { keyPath: 'id', autoIncrement: true });
@@ -264,7 +271,6 @@
                     const transaction = db.transaction([storeName], 'readwrite');
                     const store = transaction.objectStore(storeName);
                     const request = store.add(data);
-
                     request.onsuccess = () => resolve(request.result);
                     request.onerror = () => reject('Error adding data');
                 });
@@ -275,7 +281,6 @@
                     const transaction = db.transaction([storeName], 'readonly');
                     const store = transaction.objectStore(storeName);
                     const request = store.getAll();
-
                     request.onsuccess = () => resolve(request.result);
                     request.onerror = () => reject('Error getting all data');
                 });
@@ -286,7 +291,6 @@
                     const transaction = db.transaction([storeName], 'readwrite');
                     const store = transaction.objectStore(storeName);
                     const request = store.put(data);
-                    
                     request.onsuccess = () => resolve(request.result);
                     request.onerror = () => reject('Error updating data');
                 });
@@ -297,57 +301,12 @@
                     const transaction = db.transaction([storeName], 'readwrite');
                     const store = transaction.objectStore(storeName);
                     const request = store.delete(id);
-                    
                     request.onsuccess = () => resolve();
                     request.onerror = () => reject('Error deleting data');
                 });
             };
 
-            // --- State and Variables ---
-            let projects = [];
-            let activeTimer = null;
-            let timerInterval = null;
-            let showingCompletedProjects = false;
-            
-            const projectColors = ['#F9A825', '#EF4444', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F97316', '#6366F1'];
-            let colorIndex = 0;
-
-            const elements = {
-                // Main UI
-                dashboardProjectsList: document.getElementById('dashboard-projects-list'),
-                openSettingsBtn: document.getElementById('open-settings-btn'),
-                currentMonthHours: document.getElementById('current-month-hours'),
-                // Settings Modal
-                settingsModal: document.getElementById('settings-modal'),
-                closeSettingsBtn: document.getElementById('close-settings-btn'),
-                settingsTabButtons: document.querySelectorAll('.settings-tab-button'),
-                settingsTabContents: document.querySelectorAll('.settings-tab-content'),
-                // Add Project Tab
-                addProjectForm: document.getElementById('add-project-form'),
-                // Project Management Tab
-                projectsList: document.getElementById('projects-list'),
-                toggleCompletedBtn: document.getElementById('toggle-completed-btn'),
-                // Manual Time Tab
-                manualTimeForm: document.getElementById('manual-time-form'),
-                manualProjectSelect: document.getElementById('manual-project-select'),
-                manualTaskDescription: document.getElementById('manual-task-description'),
-                manualMinutes: document.getElementById('manual-minutes'),
-                // Report Generation Tab
-                reportForm: document.getElementById('report-form'),
-                reportOutput: document.getElementById('report-output'),
-                exportJsonBtn: document.getElementById('export-json-btn'),
-                exportCsvBtn: document.getElementById('export-csv-btn'),
-            };
-
             // --- UI Rendering Functions ---
-            const formatTime = (milliseconds) => {
-                const totalSeconds = Math.floor(milliseconds / 1000);
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            };
-            
             const updateCurrentMonthHours = async () => {
                 const now = new Date();
                 const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -358,7 +317,6 @@
                     const taskDate = new Date(task.timestamp);
                     return taskDate >= startOfMonth && taskDate <= endOfMonth;
                 });
-
                 const totalTimeInHours = monthlyTasks.reduce((sum, task) => sum + (task.duration / 3600000), 0);
                 elements.currentMonthHours.textContent = totalTimeInHours.toFixed(2);
             };
@@ -428,14 +386,14 @@
                                 <path d="M5.25 7.5A.75.75 0 0 1 6 6.75h12a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-.75.75H6a.75.75 0 0 1-.75-.75V7.5Z" />
                             </svg>
                            </button>`
-                        : `<button type="submit" class="start-timer-btn p-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full shadow-lg transition-transform transform hover:scale-105" data-project-id="${project.id}">
+                        : `<button type="button" class="start-timer-btn p-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full shadow-lg transition-transform transform hover:scale-105" data-project-id="${project.id}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M5 3l14 9-14 9V3z"></path>
                             </svg>
                            </button>`;
                             
                     return `
-                        <div class="bg-gray-700 p-4 rounded-xl shadow-md border-t-4 border-b-4 ${isRunning ? 'border-yellow-500' : 'border-gray-600'} flex flex-col justify-between aspect-square w-full border" style="border-top-color: ${project.color}; border-bottom-color: ${project.color};">
+                        <div class="project-card bg-gray-700 p-4 rounded-xl shadow-md border-t-4 border-b-4 ${isRunning ? 'border-yellow-500' : 'border-gray-600'} flex flex-col justify-between aspect-square w-full border" style="border-top-color: ${project.color}; border-bottom-color: ${project.color};" data-project-id="${project.id}">
                             <div>
                                 <h3 class="font-bold text-lg text-gray-50">${project.name}</h3>
                             </div>
@@ -507,16 +465,29 @@
             };
             
             // --- Event Handlers ---
+            elements.dashboardBtn.addEventListener('click', () => {
+                elements.dashboardSection.classList.remove('hidden');
+                elements.settingsSection.classList.add('hidden');
+                elements.dashboardBtn.classList.add('active', 'bg-gray-700');
+                elements.settingsBtn.classList.remove('active', 'bg-gray-700');
+                renderDashboardProjects();
+            });
 
-            elements.openSettingsBtn.addEventListener('click', () => {
-                elements.settingsModal.classList.remove('hidden');
+            elements.settingsBtn.addEventListener('click', () => {
+                elements.settingsSection.classList.remove('hidden');
+                elements.dashboardSection.classList.add('hidden');
+                elements.settingsBtn.classList.add('active', 'bg-gray-700');
+                elements.dashboardBtn.classList.remove('active', 'bg-gray-700');
                 // Auto-select first tab
                 elements.settingsTabButtons[0].click();
             });
-            
-            elements.closeSettingsBtn.addEventListener('click', () => {
-                elements.settingsModal.classList.add('hidden');
-                renderDashboardProjects();
+
+            elements.addProjectButton.addEventListener('click', () => {
+                elements.settingsSection.classList.remove('hidden');
+                elements.dashboardSection.classList.add('hidden');
+                elements.settingsBtn.classList.add('active', 'bg-gray-700');
+                elements.dashboardBtn.classList.remove('active', 'bg-gray-700');
+                document.querySelector('.settings-tab-button[data-tab="add-project"]').click();
             });
 
             elements.settingsTabButtons.forEach(button => {
@@ -533,7 +504,7 @@
                 e.preventDefault();
                 const name = document.getElementById('project-name').value;
                 if (!name) {
-                    showMessage('Please enter a project name.');
+                    // No need to show a message, the required attribute handles this
                     return;
                 }
                 const newProject = { 
@@ -546,8 +517,6 @@
                 await addData('projects', newProject);
                 elements.addProjectForm.reset();
                 await loadAllData();
-                showMessage('Project added successfully!');
-                elements.settingsModal.classList.add('hidden');
             });
 
             elements.toggleCompletedBtn.addEventListener('click', async () => {
@@ -558,11 +527,10 @@
             elements.manualTimeForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const projectId = parseInt(elements.manualProjectSelect.value);
-                const description = elements.manualTaskDescription.value;
+                const description = elements.manualTaskDescription.value || 'Untitled Task';
                 const minutes = parseInt(elements.manualMinutes.value);
 
-                if (!projectId || !description || isNaN(minutes) || minutes <= 0) {
-                    showMessage('Please fill all fields for manual time entry.');
+                if (!projectId || isNaN(minutes) || minutes <= 0) {
                     return;
                 }
                 
@@ -574,7 +542,6 @@
                 };
                 await addData('tasks', task);
                 elements.manualTimeForm.reset();
-                showMessage('Manual time added successfully!');
                 updateCurrentMonthHours();
             });
 
@@ -583,7 +550,6 @@
                 if (startBtn) {
                     e.preventDefault();
                     if (activeTimer) {
-                        showMessage('A timer is already running. Please stop it first.');
                         return;
                     }
                     const projectId = parseInt(startBtn.dataset.projectId);
@@ -614,7 +580,6 @@
                         };
                         
                         await addData('tasks', task);
-                        showMessage('Time logged successfully!');
                         clearInterval(timerInterval);
                         activeTimer = null;
                         renderDashboardProjects();
@@ -627,14 +592,8 @@
                     const btn = e.target.closest('.delete-btn');
                     const id = parseInt(btn.dataset.id);
                     const type = btn.dataset.type;
-                    
-                    const confirmDelete = async () => {
-                        await deleteData(type + 's', id);
-                        await loadAllData();
-                        showMessage(`${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully.`);
-                    };
-                    
-                    showAlert(`Are you sure you want to delete this ${type}?`, 'Confirm Deletion', 'confirm', confirmDelete);
+                    await deleteData(type + 's', id);
+                    await loadAllData();
                 }
 
                 if (e.target.closest('.delete-task-btn')) {
@@ -643,7 +602,6 @@
                     const projectId = parseInt(btn.closest('.project-card').dataset.projectId);
                     await deleteData('tasks', taskId);
                     await renderProjectTasks(projectId);
-                    showMessage('Task deleted successfully.');
                 }
                 
                 if (e.target.matches('.complete-btn') || e.target.matches('.restore-btn')) {
@@ -654,7 +612,6 @@
                         projectToUpdate.isComplete = !projectToUpdate.isComplete;
                         await updateData('projects', projectToUpdate);
                         await renderProjectsInSettings();
-                        showMessage(`Project ${projectToUpdate.isComplete ? 'completed' : 'restored'} successfully.`);
                     }
                 }
             });
@@ -665,7 +622,6 @@
                 const endDate = new Date(document.getElementById('report-end-date').value);
                 
                 if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                    showMessage('Please select valid start and end dates.');
                     return;
                 }
                 
@@ -753,7 +709,6 @@
                 };
                 const jsonString = JSON.stringify(allData, null, 2);
                 downloadFile(jsonString, 'time_tracker_data.json', 'application/json');
-                showMessage('Data exported as JSON successfully!');
             };
 
             const exportDataAsCSV = async () => {
@@ -779,25 +734,33 @@
                 });
                 
                 downloadFile(csvContent, 'time_tracker_report.csv', 'text/csv');
-                showMessage('Time log exported as CSV successfully!');
             };
             
             elements.exportJsonBtn.addEventListener('click', exportDataAsJSON);
             elements.exportCsvBtn.addEventListener('click', exportDataAsCSV);
-            
+
             // --- Initialization ---
             const loadAllData = async () => {
-                await openDB();
-                projects = await getAllData('projects');
-                renderProjectsInSettings();
-                renderDashboardProjects();
-                updateCurrentMonthHours();
+                try {
+                    await openDB();
+                    projects = await getAllData('projects');
+                    renderProjectsInSettings();
+                    renderDashboardProjects();
+                    updateCurrentMonthHours();
+                } catch (err) {
+                    console.error('Failed to initialize the application.', err);
+                }
             };
-
-            loadAllData().catch(err => {
-                console.error('Failed to load data:', err);
-                showMessage('Failed to initialize the application. Please check the console for details.', 'Error');
-            });
+            
+            // Set default dates for report form
+            const today = new Date();
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            document.getElementById('report-start-date').value = startOfMonth.toISOString().split('T')[0];
+            document.getElementById('report-end-date').value = today.toISOString().split('T')[0];
+            
+            setInterval(formatCurrentTime, 1000);
+            
+            loadAllData();
         });
     </script>
 </body>
