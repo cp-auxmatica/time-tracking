@@ -13,17 +13,17 @@
         ::-webkit-scrollbar-track { background-color: #1f2937; }
         ::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 10px; }
         .timer-display { font-variant-numeric: tabular-nums; }
-        .report-filter-btn.active { background-color: #2563eb; color: white; }
+        .report-mode-btn.active { background-color: #2563eb; color: white; }
         .modal-backdrop { position: fixed; inset: 0; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 50; }
         .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 60; }
         .dropdown { position: relative; }
-        .dropdown-content { display: none; position: absolute; right: 0; background-color: #1f2937; min-width: 120px; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4); z-index: 10; border-radius: 8px; border: 1px solid #374151; overflow: hidden; }
+        .dropdown-content { display: none; position: absolute; right: 0; background-color: #1f2937; min-width: 160px; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4); z-index: 10; border-radius: 8px; border: 1px solid #374151; overflow: hidden; }
         .dropdown-content button { color: #d1d5db; padding: 12px 16px; text-decoration: none; display: block; text-align: left; width: 100%; background: none; border: none; }
         .dropdown-content button:hover { background-color: #374151; color: white; }
-        .dropdown:hover .dropdown-content { display: block; }
+        .dropdown:hover .dropdown-content, .dropdown.active .dropdown-content { display: block; }
     </style>
 </head>
-<body class="bg-gray-900 text-white transition-colors duration-300">
+<body class="bg-gray-900 text-white">
 
     <div class="container mx-auto p-4 sm:p-8">
         <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-700">
@@ -31,6 +31,14 @@
             <div class="flex items-center space-x-2">
                 <button id="dashboard-btn" class="px-3 py-2 font-semibold rounded-lg bg-gray-700 text-white">Dashboard</button>
                 <button id="reports-btn" class="px-3 py-2 font-semibold rounded-lg hover:bg-gray-700 text-gray-300">Reports</button>
+                <div class="dropdown" id="settings-dropdown-container">
+                    <button id="settings-btn" class="px-3 py-2 font-semibold rounded-lg hover:bg-gray-700 text-gray-300">Settings</button>
+                    <div class="dropdown-content">
+                        <button id="import-json-btn">Import from JSON</button>
+                        <button id="export-json-btn">Export to JSON</button>
+                        <button id="export-csv-btn">Export to CSV</button>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -43,12 +51,8 @@
                  <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Your Projects</h2>
                     <div class="flex items-center space-x-2">
-                        <button id="manual-entry-btn" title="Add Manual Time Entry" class="bg-gray-600 hover:bg-gray-700 text-white font-bold h-10 w-10 flex items-center justify-center rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1a9 9 0 100 18 9 9 0 000-18zm0 2a7 7 0 110 14A7 7 0 0110 3zm1 3a1 1 0 10-2 0v3H6a1 1 0 100 2h3v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V6z" /></svg>
-                        </button>
-                        <button id="add-project-btn" title="Add New Project" class="bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 w-10 flex items-center justify-center rounded-full">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
-                        </button>
+                        <button id="manual-entry-btn" title="Add Manual Time Entry" class="bg-gray-600 hover:bg-gray-700 text-white font-bold h-10 w-10 flex items-center justify-center rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1a9 9 0 100 18 9 9 0 000-18zm0 2a7 7 0 110 14A7 7 0 0110 3zm1 3a1 1 0 10-2 0v3H6a1 1 0 100 2h3v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V6z" /></svg></button>
+                        <button id="add-project-btn" title="Add New Project" class="bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 w-10 flex items-center justify-center rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg></button>
                     </div>
                  </div>
                  <div id="dashboard-projects-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
@@ -58,11 +62,16 @@
 
         <section id="reports-section" class="hidden">
             <h2 class="text-3xl font-bold mb-4">Reports</h2>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <div class="flex space-x-2 p-2 bg-gray-800 rounded-lg border border-gray-700 w-full sm:w-auto">
-                    <button class="report-filter-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-md font-semibold transition-colors active" data-period="day">Today</button>
-                    <button class="report-filter-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-md font-semibold transition-colors" data-period="week">This Week</button>
-                    <button class="report-filter-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-md font-semibold transition-colors" data-period="month">This Month</button>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 p-2 bg-gray-800 rounded-lg border border-gray-700">
+                <div class="flex space-x-2">
+                    <button class="report-mode-btn px-4 py-2 rounded-md font-semibold transition-colors active" data-mode="week">Week</button>
+                    <button class="report-mode-btn px-4 py-2 rounded-md font-semibold transition-colors" data-mode="month">Month</button>
+                    <button class="report-mode-btn px-4 py-2 rounded-md font-semibold transition-colors" data-mode="day">Day</button>
+                </div>
+                <div class="flex items-center justify-center space-x-2">
+                    <button id="report-prev-btn" class="p-2 rounded-md hover:bg-gray-700">&lt;</button>
+                    <div id="report-date-range" class="text-center font-semibold w-64"></div>
+                    <button id="report-next-btn" class="p-2 rounded-md hover:bg-gray-700">&gt;</button>
                 </div>
             </div>
             <div id="report-output"></div>
@@ -70,7 +79,6 @@
     </div>
 
     <div id="modal-backdrop" class="modal-backdrop hidden"></div>
-
     <div id="entry-modal" class="modal hidden w-11/12 max-w-lg bg-gray-800 rounded-lg shadow-xl border border-gray-700">
         <div class="p-6 border-b border-gray-700"><h3 id="entry-modal-title" class="text-xl font-bold"></h3></div>
         <div class="p-6 space-y-4">
@@ -90,16 +98,19 @@
             <button id="entry-save-btn" class="px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">Save</button>
         </div>
     </div>
-
     <div id="project-detail-modal" class="modal hidden w-11/12 max-w-2xl bg-gray-800 rounded-lg shadow-xl border border-gray-700">
         <div id="project-detail-content"></div>
     </div>
+    
+    <input type="file" id="import-file-input" class="hidden" accept="application/json">
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         // --- Global State ---
         let projects = [], tasks = [], activeTimer = null, timerInterval = null;
         const projectColors = ['#3B82F6', '#10B981', '#F97316', '#8B5CF6', '#EF4444', '#F9A825', '#EC4899', '#6366F1'];
+        let reportViewMode = 'week';
+        let reportCurrentDate = new Date();
         
         // --- DOM Element Cache ---
         const elements = {
@@ -111,10 +122,15 @@
             entrySaveBtn: document.getElementById('entry-save-btn'), entryCancelBtn: document.getElementById('entry-cancel-btn'),
             projectDetailModal: document.getElementById('project-detail-modal'), projectDetailContent: document.getElementById('project-detail-content'),
             dashboardBtn: document.getElementById('dashboard-btn'), reportsBtn: document.getElementById('reports-btn'),
+            settingsBtn: document.getElementById('settings-btn'),
             dashboardSection: document.getElementById('dashboard-section'), reportsSection: document.getElementById('reports-section'),
             todaysHours: document.getElementById('todays-hours'), currentTimeDisplay: document.getElementById('current-time'),
             dashboardProjectsList: document.getElementById('dashboard-projects-list'), todaysLogList: document.getElementById('todays-log-list'),
             addProjectBtn: document.getElementById('add-project-btn'), reportOutput: document.getElementById('report-output'),
+            reportPrevBtn: document.getElementById('report-prev-btn'), reportNextBtn: document.getElementById('report-next-btn'),
+            reportDateRange: document.getElementById('report-date-range'),
+            importJsonBtn: document.getElementById('import-json-btn'), exportJsonBtn: document.getElementById('export-json-btn'),
+            exportCsvBtn: document.getElementById('export-csv-btn'), importFileInput: document.getElementById('import-file-input'),
         };
 
         // --- Helper Functions ---
@@ -126,12 +142,13 @@
         };
 
         // --- IndexedDB ---
-        let db; const DB_VERSION = 10;
+        let db; const DB_VERSION = 11;
         const openDB = () => new Promise(r=>{const req=indexedDB.open('timeTrackerDB',DB_VERSION);req.onupgradeneeded=e=>{db=e.target.result;if(!db.objectStoreNames.contains('projects'))db.createObjectStore('projects',{keyPath:'id',autoIncrement:true});if(!db.objectStoreNames.contains('tasks'))db.createObjectStore('tasks',{keyPath:'id',autoIncrement:true}).createIndex('startTime','startTime');};req.onsuccess=e=>{db=e.target.result;r(db)};});
         const addData = (store, data) => new Promise(r => db.transaction(store, 'readwrite').objectStore(store).add(data).onsuccess = e => r(e.target.result));
         const getAllData = (store) => new Promise(r => db.transaction(store, 'readonly').objectStore(store).getAll().onsuccess = e => r(e.target.result));
         const updateData = (store, data) => new Promise(r => db.transaction(store, 'readwrite').objectStore(store).put(data).onsuccess = () => r());
         const deleteData = (store, id) => new Promise(r => db.transaction(store, 'readwrite').objectStore(store).delete(id).onsuccess = () => r());
+        const clearData = (store) => new Promise(r => db.transaction(store, 'readwrite').objectStore(store).clear().onsuccess = () => r());
 
         // --- Data & State Management ---
         const loadData = async () => { await openDB(); [projects, tasks] = await Promise.all([getAllData('projects'), getAllData('tasks')]); renderAllDashboard(); };
@@ -141,10 +158,78 @@
         const startTimer = (id) => { const d = document.querySelector(`.project-card[data-project-id="${id}"] .task-description-input`).value.trim()||'Untitled Task'; if(activeTimer)return alert('Another timer is running.'); activeTimer={projectId:id,description:d,startTime:Date.now()};localStorage.setItem('activeTimerState', JSON.stringify(activeTimer));startTimerInterval();renderDashboardProjects(); };
         const stopTimer = async () => { if (!activeTimer) return; const t = { projectId: activeTimer.projectId, description: activeTimer.description, startTime: activeTimer.startTime, endTime: Date.now() }; t.id = await addData('tasks', t); tasks.push(t); localStorage.removeItem('activeTimerState'); activeTimer = null; stopTimerInterval(); renderAllDashboard(); };
         const addProject = async () => { const n = prompt("Enter new project name:"); if (n&&n.trim()) { const p = { name: n.trim(), color: projectColors[projects.length % projectColors.length] }; p.id = await addData('projects', p); projects.push(p); renderAllDashboard(); } };
+        const deleteProject = async (projectId) => {
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+            if (confirm(`Are you sure you want to delete "${project.name}" and all its time entries? This cannot be undone.`)) {
+                const tasksToDelete = tasks.filter(t => t.projectId === projectId);
+                await Promise.all(tasksToDelete.map(t => deleteData('tasks', t.id)));
+                await deleteData('projects', projectId);
+                tasks = tasks.filter(t => t.projectId !== projectId);
+                projects = projects.filter(p => p.id !== projectId);
+                renderAllDashboard();
+                if (!elements.reportsSection.classList.contains('hidden')) renderReportView();
+            }
+        };
         const startTimerInterval = () => { if(timerInterval)clearInterval(timerInterval); timerInterval = setInterval(() => { if (activeTimer) { const el = document.getElementById(`timer-display-${activeTimer.projectId}`); if (el) el.textContent = formatTime(Date.now() - activeTimer.startTime); } }, 1000); };
         const stopTimerInterval = () => { clearInterval(timerInterval); timerInterval = null; };
 
-        // --- Entry Modal Logic (Edit and Manual) ---
+        // --- Import / Export ---
+        const downloadFile = (data, filename, type) => {
+            const blob = new Blob([data], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        };
+        const exportDataAsJSON = () => { downloadFile(JSON.stringify({ projects, tasks }, null, 2), 'time_tracker_backup.json', 'application/json'); };
+        const exportDataAsCSV = () => {
+            const projectMap = new Map(projects.map(p => [p.id, p.name]));
+            let csvContent = 'Project,Description,Date,Start Time,End Time,Duration (HH:MM:SS)\n';
+            tasks.forEach(t => {
+                const sT = new Date(t.startTime), eT = new Date(t.endTime);
+                const row = [
+                    projectMap.get(t.projectId) || 'Unknown',
+                    `"${t.description.replace(/"/g, '""')}"`,
+                    sT.toLocaleDateString(), sT.toLocaleTimeString(), eT.toLocaleTimeString(),
+                    formatTime(t.endTime - t.startTime)
+                ];
+                csvContent += row.join(',') + '\n';
+            });
+            downloadFile(csvContent, 'time_tracker_export.csv', 'text/csv;charset=utf-8;');
+        };
+        const importDataFromJSON = (event) => {
+            const file = event.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    if (!Array.isArray(importedData.projects) || !Array.isArray(importedData.tasks)) throw new Error("Invalid file format.");
+
+                    if (confirm("This will overwrite all current data. Are you sure you want to proceed?")) {
+                        await Promise.all([clearData('tasks'), clearData('projects')]);
+                        const newProjectsMap = new Map();
+                        for (const p of importedData.projects) {
+                            const { id, ...projectData } = p;
+                            const newId = await addData('projects', projectData);
+                            newProjectsMap.set(id, newId);
+                        }
+                        const tasksToAdd = importedData.tasks.map(t => { const { id, ...taskData } = t; return {...taskData, projectId: newProjectsMap.get(t.projectId)}; });
+                        await Promise.all(tasksToAdd.map(t => t.projectId ? addData('tasks', t) : null));
+                        alert("Data imported successfully!");
+                        await loadData();
+                    }
+                } catch (error) { alert("Failed to import data: " + error.message); } 
+                finally { elements.importFileInput.value = null; }
+            };
+            reader.readAsText(file);
+        };
+
+        // --- Entry Modal Logic ---
         const openEntryModal = (mode, id = null) => {
             elements.modalBackdrop.classList.remove('hidden'); elements.entryModal.classList.remove('hidden'); elements.entryModal.dataset.mode = mode;
             if (mode === 'edit') {
@@ -175,9 +260,30 @@
                 const projectId = parseInt(elements.manualProjectSelect.value); if (!projectId) return alert("Please select a project.");
                 const newTask = { projectId, description, startTime: newStartTimestamp, endTime: newEndTimestamp }; newTask.id = await addData('tasks', newTask); tasks.push(newTask);
             }
-            closeEntryModal(); renderAllDashboard(); if (!elements.reportsSection.classList.contains('hidden')) generateReport(document.querySelector('.report-filter-btn.active').dataset.period);
+            closeEntryModal(); renderAllDashboard(); if (!elements.reportsSection.classList.contains('hidden')) renderReportView();
         };
-        const deleteTask = async (id) => { if(confirm("Are you sure?")) { await deleteData('tasks',id); tasks=tasks.filter(t=>t.id!==id); renderAllDashboard(); if(!elements.reportsSection.classList.contains('hidden')) generateReport(document.querySelector('.report-filter-btn.active').dataset.period); } };
+        const deleteTask = async (id) => { if(confirm("Are you sure?")) { await deleteData('tasks',id); tasks=tasks.filter(t=>t.id!==id); renderAllDashboard(); if(!elements.reportsSection.classList.contains('hidden')) renderReportView(); } };
+        
+        // --- In-place Project Name Edit ---
+        const initiateProjectNameEdit = (editBtn) => {
+            const card = editBtn.closest('.project-card'); if (!card) return;
+            const nameEl = card.querySelector('.project-name'); if (!nameEl) return;
+            const originalText = nameEl.textContent; const projectId = parseInt(card.dataset.projectId);
+            const input = document.createElement('input');
+            input.type = 'text'; input.value = originalText;
+            input.className = 'bg-black/50 text-white font-bold text-xl p-1 rounded w-full';
+            nameEl.replaceWith(input); input.focus(); input.select();
+            const saveProjectName = async () => {
+                const newName = input.value.trim();
+                if (newName && newName !== originalText) {
+                    const project = projects.find(p => p.id === projectId);
+                    if(project) { project.name = newName; await updateData('projects', project); }
+                }
+                renderAllDashboard(); if (!elements.reportsSection.classList.contains('hidden')) renderReportView();
+            };
+            input.addEventListener('blur', saveProjectName);
+            input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); if (e.key === 'Escape') renderAllDashboard(); });
+        };
 
         // --- UI Rendering ---
         const renderAllDashboard = () => { renderDashboardProjects(); updateTodaysMetrics(); renderTodaysLog(); };
@@ -194,11 +300,15 @@
                 return `<div class="project-card rounded-lg shadow-md flex flex-col border-2" style="background-color: ${bgColor}; border-color: ${p.color || '#6b7280'}" data-project-id="${p.id}">
                     <div class="p-4 flex-grow">
                         <div class="flex justify-between items-start mb-2">
-                            <button class="project-title-link font-bold text-xl hover:underline text-gray-100" data-project-id="${p.id}">${p.name}</button>
-                            <label class="cursor-pointer">
-                                <input type="color" class="absolute opacity-0 w-6 h-6" value="${p.color || '#6b7280'}" onchange="handleProjectColorChange(event, ${p.id})">
-                                <span class="block w-6 h-6 rounded-full" style="background-color: ${p.color || '#6b7280'}"></span>
-                            </label>
+                            <h3 class="project-detail-link project-name font-bold text-xl text-gray-100 cursor-pointer hover:underline" data-project-id="${p.id}">${p.name}</h3>
+                            <div class="flex items-center space-x-2">
+                                <button class="edit-project-btn text-gray-400 hover:text-white" title="Edit Project Name"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg></button>
+                                <button class="delete-project-btn text-gray-400 hover:text-red-500" title="Delete Project"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 pointer-events-none" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg></button>
+                                <label class="cursor-pointer">
+                                    <input type="color" class="absolute opacity-0 w-6 h-6" value="${p.color || '#6b7280'}" onchange="handleProjectColorChange(event, ${p.id})">
+                                    <span class="block w-6 h-6 rounded-full" style="background-color: ${p.color || '#6b7280'}"></span>
+                                </label>
+                            </div>
                         </div>
                         <p id="timer-display-${p.id}" class="text-4xl font-bold timer-display mb-3 ${isR?'text-yellow-400':'text-gray-400'}">${isR?formatTime(Date.now()-activeTimer.startTime):'00:00:00'}</p>
                         <input type="text" placeholder="What are you working on?" class="task-description-input w-full bg-black/20 p-2 rounded-md border border-gray-600" ${isR?`value="${activeTimer.description}" disabled`:''}>
@@ -214,6 +324,7 @@
         // --- Report & Project Detail Generation ---
         const openProjectDetailModal = (projectId) => {
             const project = projects.find(p => p.id === projectId);
+            if (!project) return;
             const projectTasks = tasks.filter(t => t.projectId === projectId).sort((a,b)=>b.startTime-a.startTime);
             const totalDuration = projectTasks.reduce((sum, t) => sum + (t.endTime - t.startTime), 0);
             
@@ -227,18 +338,32 @@
             elements.projectDetailModal.classList.remove('hidden'); elements.modalBackdrop.classList.remove('hidden');
         };
         const closeProjectDetailModal = () => { elements.projectDetailModal.classList.add('hidden'); if (elements.entryModal.classList.contains('hidden')) elements.modalBackdrop.classList.add('hidden'); };
-        const generateReport = (period) => {
-            const now = new Date(); let startDate;
-            if (period==='day') startDate=new Date(now).setHours(0,0,0,0);
-            else if (period==='week') startDate=new Date(now.setDate(now.getDate()-now.getDay())).setHours(0,0,0,0);
-            else if (period==='month') startDate=new Date(now.getFullYear(),now.getMonth(),1).setHours(0,0,0,0);
-            const filteredTasks=tasks.filter(t=>t.startTime>=startDate);
+        
+        const renderReportView = () => {
+            let startDate, endDate; const d = new Date(reportCurrentDate); const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            if (reportViewMode === 'day') {
+                startDate = new Date(d).setHours(0, 0, 0, 0); endDate = new Date(d).setHours(23, 59, 59, 999);
+                elements.reportDateRange.textContent = d.toLocaleDateString('en-US', options);
+            } else if (reportViewMode === 'week') {
+                const firstDay = new Date(d.setDate(d.getDate() - d.getDay()));
+                const lastDay = new Date(firstDay); lastDay.setDate(lastDay.getDate() + 6);
+                startDate = firstDay.setHours(0, 0, 0, 0); endDate = lastDay.setHours(23, 59, 59, 999);
+                elements.reportDateRange.textContent = `${new Date(startDate).toLocaleDateString('en-US', options)} - ${new Date(endDate).toLocaleDateString('en-US', options)}`;
+            } else { // month
+                startDate = new Date(d.getFullYear(), d.getMonth(), 1).setHours(0, 0, 0, 0);
+                endDate = new Date(d.getFullYear(), d.getMonth() + 1, 0).setHours(23, 59, 59, 999);
+                elements.reportDateRange.textContent = d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            }
+            elements.reportNextBtn.disabled = endDate > new Date(); elements.reportNextBtn.classList.toggle('opacity-50', endDate > new Date());
+            generateReport(startDate, endDate);
+        };
+        
+        const generateReport = (startDate, endDate) => {
+            const filteredTasks = tasks.filter(t => t.startTime >= startDate && t.startTime <= endDate);
             if(filteredTasks.length===0){ elements.reportOutput.innerHTML=`<p class="text-gray-500 text-center bg-gray-800 p-6 rounded-lg">No data for this period.</p>`; return; }
-            
             const reportData = filteredTasks.reduce((acc, task) => { if (!acc[task.projectId]) { const p = projects.find(p => p.id === task.projectId); acc[task.projectId] = { id: p?.id, name: p?.name || 'Unknown', color: p?.color || '#71717a', totalDuration: 0, entries: [] }; } acc[task.projectId].totalDuration += (task.endTime - task.startTime); acc[task.projectId].entries.push(task); return acc; }, {});
             const grandTotal=filteredTasks.reduce((sum,t)=>sum+(t.endTime-t.startTime),0);
-            let reportHTML=`<div class="bg-blue-900/50 p-6 rounded-xl mb-6 border border-blue-700"><h3 class="text-2xl font-bold text-blue-300">Grand Total for This ${period}</h3><p class="text-4xl font-bold">${formatTime(grandTotal)}</p></div>`;
-            
+            let reportHTML=`<div class="bg-blue-900/50 p-6 rounded-xl mb-6 border border-blue-700"><h3 class="text-2xl font-bold text-blue-300">Grand Total</h3><p class="text-4xl font-bold">${formatTime(grandTotal)}</p></div>`;
             for (const projectId in reportData) {
                 const data = reportData[projectId]; data.entries.sort((a,b) => b.startTime - a.startTime);
                 reportHTML += `<div class="bg-gray-800 rounded-lg mb-6 border-t-4 shadow-sm" style="border-color: ${data.color};"><header class="p-4 flex justify-between items-center border-b border-gray-700"><button class="project-detail-link text-xl font-bold hover:underline" data-project-id="${data.id}">${data.name}</button><span class="text-2xl font-semibold timer-display">${formatTime(data.totalDuration)}</span></header><div class="p-4 space-y-3">${data.entries.map(createTaskEntryHTML).join('')}</div></div>`;
@@ -248,30 +373,45 @@
 
         // --- Event Handlers ---
         elements.dashboardBtn.onclick = () => { elements.dashboardSection.classList.remove('hidden'); elements.reportsSection.classList.add('hidden'); elements.dashboardBtn.classList.add('bg-gray-700'); elements.reportsBtn.classList.remove('bg-gray-700'); renderAllDashboard(); };
-        elements.reportsBtn.onclick = () => { elements.reportsSection.classList.remove('hidden'); elements.dashboardSection.classList.add('hidden'); elements.reportsBtn.classList.add('bg-gray-700'); elements.dashboardBtn.classList.remove('bg-gray-700'); document.querySelector('.report-filter-btn[data-period="day"]').click(); };
+        elements.reportsBtn.onclick = () => { elements.reportsSection.classList.remove('hidden'); elements.dashboardSection.classList.add('hidden'); elements.reportsBtn.classList.add('bg-gray-700'); elements.dashboardBtn.classList.remove('bg-gray-700'); reportCurrentDate = new Date(); document.querySelector('.report-mode-btn[data-mode="week"]').click(); };
         elements.addProjectBtn.onclick = addProject;
         elements.manualEntryBtn.onclick = () => openEntryModal('manual');
         elements.entrySaveBtn.onclick = saveEntry;
         elements.entryCancelBtn.onclick = closeEntryModal;
         elements.modalBackdrop.onclick = () => { closeEntryModal(); closeProjectDetailModal(); };
+        elements.importJsonBtn.onclick = () => elements.importFileInput.click();
+        elements.importFileInput.onchange = importDataFromJSON;
+        elements.exportJsonBtn.onclick = exportDataAsJSON;
+        elements.exportCsvBtn.onclick = exportDataAsCSV;
+        
         document.addEventListener('click', e => {
-            const startBtn = e.target.closest('.start-timer-btn');
-            const stopBtn = e.target.closest('.stop-timer-btn');
-            const reportFilterBtn = e.target.closest('.report-filter-btn');
-            const editBtn = e.target.closest('.edit-task-btn');
-            const deleteBtn = e.target.closest('.delete-task-btn');
-            const projectTitleLink = e.target.closest('.project-title-link');
-            const projectDetailLink = e.target.closest('.project-detail-link');
-            const closeDetailBtn = e.target.closest('#close-detail-modal-btn');
-
+            const startBtn=e.target.closest('.start-timer-btn'), stopBtn=e.target.closest('.stop-timer-btn'), editBtn=e.target.closest('.edit-task-btn'), deleteBtn=e.target.closest('.delete-task-btn'), projectDetailLink=e.target.closest('.project-detail-link'), closeDetailBtn=e.target.closest('#close-detail-modal-btn'), editProjectBtn=e.target.closest('.edit-project-btn'), deleteProjectBtn = e.target.closest('.delete-project-btn');
             if(startBtn) startTimer(parseInt(startBtn.closest('.project-card').dataset.projectId));
             else if(stopBtn) stopTimer();
-            else if(reportFilterBtn){document.querySelectorAll('.report-filter-btn').forEach(b=>b.classList.remove('active', 'bg-blue-600', 'text-white')); reportFilterBtn.classList.add('active', 'bg-blue-600', 'text-white'); generateReport(reportFilterBtn.dataset.period);}
             else if(editBtn) openEntryModal('edit', parseInt(editBtn.dataset.taskId));
             else if(deleteBtn) deleteTask(parseInt(deleteBtn.dataset.taskId));
-            else if(projectTitleLink) openProjectDetailModal(parseInt(projectTitleLink.dataset.projectId));
             else if(projectDetailLink) openProjectDetailModal(parseInt(projectDetailLink.dataset.projectId));
             else if(closeDetailBtn) closeProjectDetailModal();
+            else if(editProjectBtn) initiateProjectNameEdit(editProjectBtn);
+            else if(deleteProjectBtn) deleteProject(parseInt(deleteProjectBtn.closest('.project-card').dataset.projectId));
+        });
+
+        document.querySelectorAll('.report-mode-btn').forEach(btn => btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.report-mode-btn').forEach(b=>b.classList.remove('active')); e.target.classList.add('active');
+            reportViewMode = e.target.dataset.mode; reportCurrentDate = new Date(); renderReportView();
+        }));
+        elements.reportPrevBtn.addEventListener('click', () => {
+            if (reportViewMode === 'day') reportCurrentDate.setDate(reportCurrentDate.getDate() - 1);
+            else if (reportViewMode === 'week') reportCurrentDate.setDate(reportCurrentDate.getDate() - 7);
+            else if (reportViewMode === 'month') reportCurrentDate.setMonth(reportCurrentDate.getMonth() - 1);
+            renderReportView();
+        });
+        elements.reportNextBtn.addEventListener('click', () => {
+            if (elements.reportNextBtn.disabled) return;
+            if (reportViewMode === 'day') reportCurrentDate.setDate(reportCurrentDate.getDate() + 1);
+            else if (reportViewMode === 'week') reportCurrentDate.setDate(reportCurrentDate.getDate() + 7);
+            else if (reportViewMode === 'month') reportCurrentDate.setMonth(reportCurrentDate.getMonth() + 1);
+            renderReportView();
         });
         
         // --- Initialization ---
