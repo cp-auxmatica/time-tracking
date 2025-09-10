@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,47 +7,35 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏱️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
-    <script>
-        // Immediately set theme from localStorage to prevent FOUC (Flash of Unstyled Content)
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; @apply bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-white; }
+        body { font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { @apply bg-gray-200 dark:bg-gray-800; }
-        ::-webkit-scrollbar-thumb { @apply bg-gray-400 dark:bg-gray-600; border-radius: 10px; }
-        .container { max-width: 1200px; }
+        ::-webkit-scrollbar-track { background-color: #1f2937; }
+        ::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 10px; }
         .timer-display { font-variant-numeric: tabular-nums; }
-        .report-filter-btn.active { @apply bg-blue-600 text-white; }
-        .modal-backdrop { @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-50; }
-        .modal { @apply fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50; }
+        .report-filter-btn.active { background-color: #2563eb; color: white; }
+        .modal-backdrop { position: fixed; inset: 0; background-color: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 50; }
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 60; }
         .dropdown { position: relative; }
-        .dropdown-content { @apply hidden absolute right-0 bg-gray-200 dark:bg-gray-800 min-w-[120px] shadow-lg z-10 rounded-lg border border-gray-300 dark:border-gray-700 overflow-hidden; }
-        .dropdown-content button { @apply text-left w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700; }
+        .dropdown-content { display: none; position: absolute; right: 0; background-color: #1f2937; min-width: 120px; box-shadow: 0 8px 16px 0 rgba(0,0,0,0.4); z-index: 10; border-radius: 8px; border: 1px solid #374151; overflow: hidden; }
+        .dropdown-content button { color: #d1d5db; padding: 12px 16px; text-decoration: none; display: block; text-align: left; width: 100%; background: none; border: none; }
+        .dropdown-content button:hover { background-color: #374151; color: white; }
         .dropdown:hover .dropdown-content { display: block; }
     </style>
 </head>
-<body class="transition-colors duration-300">
+<body class="bg-gray-900 text-white transition-colors duration-300">
 
     <div class="container mx-auto p-4 sm:p-8">
-        <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-50">Time Tracker</h1>
+        <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-700">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-50">Time Tracker</h1>
             <div class="flex items-center space-x-2">
-                <button id="dashboard-btn" class="px-3 py-2 font-semibold rounded-lg bg-gray-200 dark:bg-gray-700">Dashboard</button>
-                <button id="reports-btn" class="px-3 py-2 font-semibold rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">Reports</button>
-                <button id="theme-toggle-btn" class="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700">
-                    <svg id="theme-icon-light" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                    <svg id="theme-icon-dark" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
-                </button>
+                <button id="dashboard-btn" class="px-3 py-2 font-semibold rounded-lg bg-gray-700 text-white">Dashboard</button>
+                <button id="reports-btn" class="px-3 py-2 font-semibold rounded-lg hover:bg-gray-700 text-gray-300">Reports</button>
             </div>
         </header>
 
         <section id="dashboard-section" class="block">
-            <div class="mb-8 p-4 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-sm flex justify-between items-center">
+            <div class="mb-8 p-4 rounded-xl bg-gray-800 border border-gray-700 shadow-sm flex justify-between items-center">
                 <div><h3 class="text-lg sm:text-xl font-bold">Today's Time</h3><p class="text-xl sm:text-2xl font-semibold"><span id="todays-hours">0.00</span> hours</p></div>
                 <div class="text-right"><h3 class="text-lg sm:text-xl font-bold">Current Time</h3><p class="text-xl sm:text-2xl font-semibold timer-display" id="current-time">00:00:00</p></div>
             </div>
@@ -55,8 +43,12 @@
                  <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold">Your Projects</h2>
                     <div class="flex items-center space-x-2">
-                        <button id="manual-entry-btn" title="Add Manual Time Entry" class="bg-gray-600 hover:bg-gray-700 text-white font-bold h-10 w-10 flex items-center justify-center rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg></button>
-                        <button id="add-project-btn" title="Add New Project" class="bg-blue-500 hover:bg-blue-600 text-white font-bold h-10 w-10 flex items-center justify-center rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg></button>
+                        <button id="manual-entry-btn" title="Add Manual Time Entry" class="bg-gray-600 hover:bg-gray-700 text-white font-bold h-10 w-10 flex items-center justify-center rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor"><path d="M10 1a9 9 0 100 18 9 9 0 000-18zm0 2a7 7 0 110 14A7 7 0 0110 3zm1 3a1 1 0 10-2 0v3H6a1 1 0 100 2h3v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V6z" /></svg>
+                        </button>
+                        <button id="add-project-btn" title="Add New Project" class="bg-blue-600 hover:bg-blue-700 text-white font-bold h-10 w-10 flex items-center justify-center rounded-full">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                        </button>
                     </div>
                  </div>
                  <div id="dashboard-projects-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
@@ -65,8 +57,9 @@
         </section>
 
         <section id="reports-section" class="hidden">
+            <h2 class="text-3xl font-bold mb-4">Reports</h2>
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-                <div class="flex space-x-2 p-2 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 w-full sm:w-auto">
+                <div class="flex space-x-2 p-2 bg-gray-800 rounded-lg border border-gray-700 w-full sm:w-auto">
                     <button class="report-filter-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-md font-semibold transition-colors active" data-period="day">Today</button>
                     <button class="report-filter-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-md font-semibold transition-colors" data-period="week">This Week</button>
                     <button class="report-filter-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-md font-semibold transition-colors" data-period="month">This Month</button>
@@ -78,34 +71,213 @@
 
     <div id="modal-backdrop" class="modal-backdrop hidden"></div>
 
-    <div id="entry-modal" class="modal w-11/12 max-w-lg bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 hidden">
-        <div class="p-6 border-b border-gray-200 dark:border-gray-700"><h3 id="entry-modal-title" class="text-xl font-bold"></h3></div>
+    <div id="entry-modal" class="modal hidden w-11/12 max-w-lg bg-gray-800 rounded-lg shadow-xl border border-gray-700">
+        <div class="p-6 border-b border-gray-700"><h3 id="entry-modal-title" class="text-xl font-bold"></h3></div>
         <div class="p-6 space-y-4">
             <div id="manual-project-select-container" class="hidden">
-                <label for="manual-project-select" class="block text-sm font-medium text-gray-700 dark:text-gray-400">Project</label>
-                <select id="manual-project-select" class="mt-1 block w-full bg-gray-50 dark:bg-gray-700 rounded-md border-gray-300 dark:border-gray-600 focus:ring-blue-500 focus:border-blue-500"></select>
+                <label for="manual-project-select" class="block text-sm font-medium text-gray-400">Project</label>
+                <select id="manual-project-select" class="mt-1 block w-full bg-gray-700 rounded-md border-gray-600 focus:ring-blue-500 focus:border-blue-500"></select>
             </div>
-            <div><label for="entry-description" class="block text-sm font-medium">Task Description</label><input type="text" id="entry-description" class="mt-1 block w-full bg-gray-50 dark:bg-gray-700 rounded-md border-gray-300 dark:border-gray-600"></div>
-            <div><label for="entry-date" class="block text-sm font-medium">Date</label><input type="date" id="entry-date" class="mt-1 block w-full bg-gray-50 dark:bg-gray-700 rounded-md border-gray-300 dark:border-gray-600"></div>
+            <div><label for="entry-description" class="block text-sm font-medium text-gray-400">Task Description</label><input type="text" id="entry-description" class="mt-1 block w-full bg-gray-700 rounded-md border-gray-600"></div>
+            <div><label for="entry-date" class="block text-sm font-medium text-gray-400">Date</label><input type="date" id="entry-date" class="mt-1 block w-full bg-gray-700 rounded-md border-gray-600"></div>
             <div class="grid grid-cols-2 gap-4">
-                <div><label for="entry-start-time" class="block text-sm font-medium">Start Time</label><input type="time" id="entry-start-time" class="mt-1 block w-full bg-gray-50 dark:bg-gray-700 rounded-md border-gray-300 dark:border-gray-600"></div>
-                <div><label for="entry-end-time" class="block text-sm font-medium">End Time</label><input type="time" id="entry-end-time" class="mt-1 block w-full bg-gray-50 dark:bg-gray-700 rounded-md border-gray-300 dark:border-gray-600"></div>
+                <div><label for="entry-start-time" class="block text-sm font-medium text-gray-400">Start Time</label><input type="time" id="entry-start-time" class="mt-1 block w-full bg-gray-700 rounded-md border-gray-600"></div>
+                <div><label for="entry-end-time" class="block text-sm font-medium text-gray-400">End Time</label><input type="time" id="entry-end-time" class="mt-1 block w-full bg-gray-700 rounded-md border-gray-600"></div>
             </div>
         </div>
-        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">
-            <button id="entry-cancel-btn" class="px-4 py-2 font-semibold rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">Cancel</button>
+        <div class="px-6 py-4 bg-gray-700/50 flex justify-end space-x-3 rounded-b-lg">
+            <button id="entry-cancel-btn" class="px-4 py-2 font-semibold rounded-lg hover:bg-gray-600">Cancel</button>
             <button id="entry-save-btn" class="px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700">Save</button>
         </div>
     </div>
 
-    <div id="project-detail-modal" class="modal w-11/12 max-w-2xl bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 hidden">
+    <div id="project-detail-modal" class="modal hidden w-11/12 max-w-2xl bg-gray-800 rounded-lg shadow-xl border border-gray-700">
         <div id="project-detail-content"></div>
     </div>
 
     <script>
-    // All JavaScript logic from previous versions, plus new features, will go here.
-    // The script is quite long, so it will be provided as a complete block.
-    // For brevity in this display, assume the full script logic is here.
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Global State ---
+        let projects = [], tasks = [], activeTimer = null, timerInterval = null;
+        const projectColors = ['#3B82F6', '#10B981', '#F97316', '#8B5CF6', '#EF4444', '#F9A825', '#EC4899', '#6366F1'];
+        
+        // --- DOM Element Cache ---
+        const elements = {
+            manualEntryBtn: document.getElementById('manual-entry-btn'), modalBackdrop: document.getElementById('modal-backdrop'),
+            entryModal: document.getElementById('entry-modal'), entryModalTitle: document.getElementById('entry-modal-title'),
+            manualProjectSelectContainer: document.getElementById('manual-project-select-container'), manualProjectSelect: document.getElementById('manual-project-select'),
+            entryDescription: document.getElementById('entry-description'), entryDate: document.getElementById('entry-date'),
+            entryStartTime: document.getElementById('entry-start-time'), entryEndTime: document.getElementById('entry-end-time'),
+            entrySaveBtn: document.getElementById('entry-save-btn'), entryCancelBtn: document.getElementById('entry-cancel-btn'),
+            projectDetailModal: document.getElementById('project-detail-modal'), projectDetailContent: document.getElementById('project-detail-content'),
+            dashboardBtn: document.getElementById('dashboard-btn'), reportsBtn: document.getElementById('reports-btn'),
+            dashboardSection: document.getElementById('dashboard-section'), reportsSection: document.getElementById('reports-section'),
+            todaysHours: document.getElementById('todays-hours'), currentTimeDisplay: document.getElementById('current-time'),
+            dashboardProjectsList: document.getElementById('dashboard-projects-list'), todaysLogList: document.getElementById('todays-log-list'),
+            addProjectBtn: document.getElementById('add-project-btn'), reportOutput: document.getElementById('report-output'),
+        };
+
+        // --- Helper Functions ---
+        const formatTime = (ms) => new Date(ms).toISOString().slice(11, 19);
+        const formatCurrentTime = () => elements.currentTimeDisplay.textContent = new Date().toLocaleTimeString('en-US');
+        const hexToRgba = (hex, alpha) => {
+            const r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        };
+
+        // --- IndexedDB ---
+        let db; const DB_VERSION = 10;
+        const openDB = () => new Promise(r=>{const req=indexedDB.open('timeTrackerDB',DB_VERSION);req.onupgradeneeded=e=>{db=e.target.result;if(!db.objectStoreNames.contains('projects'))db.createObjectStore('projects',{keyPath:'id',autoIncrement:true});if(!db.objectStoreNames.contains('tasks'))db.createObjectStore('tasks',{keyPath:'id',autoIncrement:true}).createIndex('startTime','startTime');};req.onsuccess=e=>{db=e.target.result;r(db)};});
+        const addData = (store, data) => new Promise(r => db.transaction(store, 'readwrite').objectStore(store).add(data).onsuccess = e => r(e.target.result));
+        const getAllData = (store) => new Promise(r => db.transaction(store, 'readonly').objectStore(store).getAll().onsuccess = e => r(e.target.result));
+        const updateData = (store, data) => new Promise(r => db.transaction(store, 'readwrite').objectStore(store).put(data).onsuccess = () => r());
+        const deleteData = (store, id) => new Promise(r => db.transaction(store, 'readwrite').objectStore(store).delete(id).onsuccess = () => r());
+
+        // --- Data & State Management ---
+        const loadData = async () => { await openDB(); [projects, tasks] = await Promise.all([getAllData('projects'), getAllData('tasks')]); renderAllDashboard(); };
+        const checkPersistentTimer = () => { const s = localStorage.getItem('activeTimerState'); if (s) { activeTimer = JSON.parse(s); startTimerInterval(); } };
+
+        // --- Core Application Logic ---
+        const startTimer = (id) => { const d = document.querySelector(`.project-card[data-project-id="${id}"] .task-description-input`).value.trim()||'Untitled Task'; if(activeTimer)return alert('Another timer is running.'); activeTimer={projectId:id,description:d,startTime:Date.now()};localStorage.setItem('activeTimerState', JSON.stringify(activeTimer));startTimerInterval();renderDashboardProjects(); };
+        const stopTimer = async () => { if (!activeTimer) return; const t = { projectId: activeTimer.projectId, description: activeTimer.description, startTime: activeTimer.startTime, endTime: Date.now() }; t.id = await addData('tasks', t); tasks.push(t); localStorage.removeItem('activeTimerState'); activeTimer = null; stopTimerInterval(); renderAllDashboard(); };
+        const addProject = async () => { const n = prompt("Enter new project name:"); if (n&&n.trim()) { const p = { name: n.trim(), color: projectColors[projects.length % projectColors.length] }; p.id = await addData('projects', p); projects.push(p); renderAllDashboard(); } };
+        const startTimerInterval = () => { if(timerInterval)clearInterval(timerInterval); timerInterval = setInterval(() => { if (activeTimer) { const el = document.getElementById(`timer-display-${activeTimer.projectId}`); if (el) el.textContent = formatTime(Date.now() - activeTimer.startTime); } }, 1000); };
+        const stopTimerInterval = () => { clearInterval(timerInterval); timerInterval = null; };
+
+        // --- Entry Modal Logic (Edit and Manual) ---
+        const openEntryModal = (mode, id = null) => {
+            elements.modalBackdrop.classList.remove('hidden'); elements.entryModal.classList.remove('hidden'); elements.entryModal.dataset.mode = mode;
+            if (mode === 'edit') {
+                const task = tasks.find(t => t.id === id); if (!task) return;
+                elements.entryModal.dataset.editingTaskId = id; elements.entryModalTitle.textContent = "Edit Time Entry";
+                elements.manualProjectSelectContainer.classList.add('hidden'); elements.entryDescription.value = task.description;
+                const startDate = new Date(task.startTime);
+                elements.entryDate.value = startDate.toISOString().split('T')[0];
+                elements.entryStartTime.value = startDate.toTimeString().slice(0, 5);
+                elements.entryEndTime.value = new Date(task.endTime).toTimeString().slice(0, 5);
+            } else { // Manual mode
+                elements.entryModalTitle.textContent = "Add Manual Entry";
+                elements.manualProjectSelectContainer.classList.remove('hidden');
+                elements.manualProjectSelect.innerHTML = projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+                elements.entryDescription.value = ""; const now = new Date();
+                elements.entryDate.value = now.toISOString().split('T')[0];
+                elements.entryStartTime.value = now.toTimeString().slice(0, 5); elements.entryEndTime.value = now.toTimeString().slice(0, 5);
+            }
+        };
+        const closeEntryModal = () => { elements.entryModal.classList.add('hidden'); if (elements.projectDetailModal.classList.contains('hidden')) { elements.modalBackdrop.classList.add('hidden'); } };
+        const saveEntry = async () => {
+            const mode = elements.entryModal.dataset.mode, date = elements.entryDate.value, startTime = elements.entryStartTime.value, endTime = elements.entryEndTime.value, description = elements.entryDescription.value.trim() || "Untitled Task", newStartTimestamp = new Date(`${date}T${startTime}`).getTime(), newEndTimestamp = new Date(`${date}T${endTime}`).getTime();
+            if (newEndTimestamp < newStartTimestamp) return alert("End time cannot be before start time.");
+            if (mode === 'edit') {
+                const taskId = parseInt(elements.entryModal.dataset.editingTaskId), task = tasks.find(t => t.id === taskId);
+                if (task) { task.description = description; task.startTime = newStartTimestamp; task.endTime = newEndTimestamp; await updateData('tasks', task); }
+            } else {
+                const projectId = parseInt(elements.manualProjectSelect.value); if (!projectId) return alert("Please select a project.");
+                const newTask = { projectId, description, startTime: newStartTimestamp, endTime: newEndTimestamp }; newTask.id = await addData('tasks', newTask); tasks.push(newTask);
+            }
+            closeEntryModal(); renderAllDashboard(); if (!elements.reportsSection.classList.contains('hidden')) generateReport(document.querySelector('.report-filter-btn.active').dataset.period);
+        };
+        const deleteTask = async (id) => { if(confirm("Are you sure?")) { await deleteData('tasks',id); tasks=tasks.filter(t=>t.id!==id); renderAllDashboard(); if(!elements.reportsSection.classList.contains('hidden')) generateReport(document.querySelector('.report-filter-btn.active').dataset.period); } };
+
+        // --- UI Rendering ---
+        const renderAllDashboard = () => { renderDashboardProjects(); updateTodaysMetrics(); renderTodaysLog(); };
+        const updateTodaysMetrics = () => { const startOfDay=new Date().setHours(0,0,0,0); elements.todaysHours.textContent = (tasks.filter(t=>t.endTime>=startOfDay).reduce((s,t)=>s+(t.endTime-t.startTime),0)/3600000).toFixed(2); };
+        const handleProjectColorChange = async (event, projectId) => {
+            const project = projects.find(p => p.id === projectId);
+            if (project) { project.color = event.target.value; await updateData('projects', project); renderAllDashboard(); }
+        };
+        const renderDashboardProjects = () => {
+            elements.dashboardProjectsList.innerHTML = projects.map(p => {
+                const isR = activeTimer?.projectId === p.id;
+                const btn = isR ? `<button class="stop-timer-btn w-full bg-red-600 h-12 text-white font-bold rounded-b-lg">Stop</button>` : `<button class="start-timer-btn w-full bg-blue-600 h-12 text-white font-bold rounded-b-lg" data-project-id="${p.id}">Start</button>`;
+                const bgColor = hexToRgba(p.color || '#6b7280', 0.1);
+                return `<div class="project-card rounded-lg shadow-md flex flex-col border-2" style="background-color: ${bgColor}; border-color: ${p.color || '#6b7280'}" data-project-id="${p.id}">
+                    <div class="p-4 flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                            <button class="project-title-link font-bold text-xl hover:underline text-gray-100" data-project-id="${p.id}">${p.name}</button>
+                            <label class="cursor-pointer">
+                                <input type="color" class="absolute opacity-0 w-6 h-6" value="${p.color || '#6b7280'}" onchange="handleProjectColorChange(event, ${p.id})">
+                                <span class="block w-6 h-6 rounded-full" style="background-color: ${p.color || '#6b7280'}"></span>
+                            </label>
+                        </div>
+                        <p id="timer-display-${p.id}" class="text-4xl font-bold timer-display mb-3 ${isR?'text-yellow-400':'text-gray-400'}">${isR?formatTime(Date.now()-activeTimer.startTime):'00:00:00'}</p>
+                        <input type="text" placeholder="What are you working on?" class="task-description-input w-full bg-black/20 p-2 rounded-md border border-gray-600" ${isR?`value="${activeTimer.description}" disabled`:''}>
+                    </div>
+                    ${btn}
+                </div>`;
+            }).join('') || `<p class="text-gray-500 col-span-full">Click '+' to add a project.</p>`;
+            window.handleProjectColorChange = handleProjectColorChange;
+        };
+        const createTaskEntryHTML = (t) => { const p=projects.find(p=>p.id===t.projectId),sT=new Date(t.startTime),eT=new Date(t.endTime),d=t.endTime-t.startTime; return `<div class="bg-gray-800 p-3 rounded-lg flex items-center justify-between border-l-4 shadow-sm" style="border-color:${p?.color||'#71717a'};"><div class="flex-grow"><p class="font-semibold">${t.description}</p><p class="text-sm text-gray-400">${p?.name||'Unknown'} &bull; ${sT.toLocaleDateString()} &bull; ${sT.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} - ${eT.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</p></div><div class="flex items-center space-x-4"><span class="font-semibold text-lg timer-display">${formatTime(d)}</span><div class="dropdown"><button class="text-gray-400 hover:text-white p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg></button><div class="dropdown-content"><button class="edit-task-btn" data-task-id="${t.id}">Edit</button><button class="delete-task-btn" data-task-id="${t.id}">Delete</button></div></div></div></div>`; };
+        const renderTodaysLog = () => { const s=new Date().setHours(0,0,0,0),t=tasks.filter(t=>t.endTime>=s).sort((a,b)=>b.startTime-a.startTime); elements.todaysLogList.innerHTML=t.length>0?t.map(createTaskEntryHTML).join(''):`<p class="text-gray-500 text-center bg-gray-800 p-4 rounded-lg">No time logged today.</p>`; };
+        
+        // --- Report & Project Detail Generation ---
+        const openProjectDetailModal = (projectId) => {
+            const project = projects.find(p => p.id === projectId);
+            const projectTasks = tasks.filter(t => t.projectId === projectId).sort((a,b)=>b.startTime-a.startTime);
+            const totalDuration = projectTasks.reduce((sum, t) => sum + (t.endTime - t.startTime), 0);
+            
+            const aggregatedTasks = projectTasks.reduce((acc, task) => {
+                const desc = task.description.toLowerCase(); if (!acc[desc]) acc[desc] = { description: task.description, duration: 0, count: 0 };
+                acc[desc].duration += (task.endTime - task.startTime); acc[desc].count++; return acc;
+            }, {});
+            const sortedAggregates = Object.values(aggregatedTasks).sort((a,b) => b.duration - a.duration);
+
+            elements.projectDetailContent.innerHTML = `<div class="p-6 border-b border-gray-700 flex justify-between items-center"><di><h3 class="text-2xl font-bold" style="color: ${project.color}">${project.name}</h3><p class="text-gray-400">Total Time Logged: <span class="font-bold">${formatTime(totalDuration)}</span></p></di><button id="close-detail-modal-btn" class="p-2 rounded-full hover:bg-gray-700 text-2xl leading-none">&times;</button></div><div class="p-6 max-h-[60vh] overflow-y-auto"><h4 class="font-bold text-lg mb-2">Summary by Activity</h4><div class="space-y-2 mb-6">${sortedAggregates.map(agg => `<div class="flex justify-between p-2 bg-gray-700/50 rounded-md"><span class="font-semibold">${agg.description} (${agg.count})</span><span>${formatTime(agg.duration)}</span></div>`).join('')}</div><h4 class="font-bold text-lg mb-2">Complete Log</h4><div class="space-y-3">${projectTasks.map(createTaskEntryHTML).join('')}</div></div>`;
+            elements.projectDetailModal.classList.remove('hidden'); elements.modalBackdrop.classList.remove('hidden');
+        };
+        const closeProjectDetailModal = () => { elements.projectDetailModal.classList.add('hidden'); if (elements.entryModal.classList.contains('hidden')) elements.modalBackdrop.classList.add('hidden'); };
+        const generateReport = (period) => {
+            const now = new Date(); let startDate;
+            if (period==='day') startDate=new Date(now).setHours(0,0,0,0);
+            else if (period==='week') startDate=new Date(now.setDate(now.getDate()-now.getDay())).setHours(0,0,0,0);
+            else if (period==='month') startDate=new Date(now.getFullYear(),now.getMonth(),1).setHours(0,0,0,0);
+            const filteredTasks=tasks.filter(t=>t.startTime>=startDate);
+            if(filteredTasks.length===0){ elements.reportOutput.innerHTML=`<p class="text-gray-500 text-center bg-gray-800 p-6 rounded-lg">No data for this period.</p>`; return; }
+            
+            const reportData = filteredTasks.reduce((acc, task) => { if (!acc[task.projectId]) { const p = projects.find(p => p.id === task.projectId); acc[task.projectId] = { id: p?.id, name: p?.name || 'Unknown', color: p?.color || '#71717a', totalDuration: 0, entries: [] }; } acc[task.projectId].totalDuration += (task.endTime - task.startTime); acc[task.projectId].entries.push(task); return acc; }, {});
+            const grandTotal=filteredTasks.reduce((sum,t)=>sum+(t.endTime-t.startTime),0);
+            let reportHTML=`<div class="bg-blue-900/50 p-6 rounded-xl mb-6 border border-blue-700"><h3 class="text-2xl font-bold text-blue-300">Grand Total for This ${period}</h3><p class="text-4xl font-bold">${formatTime(grandTotal)}</p></div>`;
+            
+            for (const projectId in reportData) {
+                const data = reportData[projectId]; data.entries.sort((a,b) => b.startTime - a.startTime);
+                reportHTML += `<div class="bg-gray-800 rounded-lg mb-6 border-t-4 shadow-sm" style="border-color: ${data.color};"><header class="p-4 flex justify-between items-center border-b border-gray-700"><button class="project-detail-link text-xl font-bold hover:underline" data-project-id="${data.id}">${data.name}</button><span class="text-2xl font-semibold timer-display">${formatTime(data.totalDuration)}</span></header><div class="p-4 space-y-3">${data.entries.map(createTaskEntryHTML).join('')}</div></div>`;
+            }
+            elements.reportOutput.innerHTML = reportHTML;
+        };
+
+        // --- Event Handlers ---
+        elements.dashboardBtn.onclick = () => { elements.dashboardSection.classList.remove('hidden'); elements.reportsSection.classList.add('hidden'); elements.dashboardBtn.classList.add('bg-gray-700'); elements.reportsBtn.classList.remove('bg-gray-700'); renderAllDashboard(); };
+        elements.reportsBtn.onclick = () => { elements.reportsSection.classList.remove('hidden'); elements.dashboardSection.classList.add('hidden'); elements.reportsBtn.classList.add('bg-gray-700'); elements.dashboardBtn.classList.remove('bg-gray-700'); document.querySelector('.report-filter-btn[data-period="day"]').click(); };
+        elements.addProjectBtn.onclick = addProject;
+        elements.manualEntryBtn.onclick = () => openEntryModal('manual');
+        elements.entrySaveBtn.onclick = saveEntry;
+        elements.entryCancelBtn.onclick = closeEntryModal;
+        elements.modalBackdrop.onclick = () => { closeEntryModal(); closeProjectDetailModal(); };
+        document.addEventListener('click', e => {
+            const startBtn = e.target.closest('.start-timer-btn');
+            const stopBtn = e.target.closest('.stop-timer-btn');
+            const reportFilterBtn = e.target.closest('.report-filter-btn');
+            const editBtn = e.target.closest('.edit-task-btn');
+            const deleteBtn = e.target.closest('.delete-task-btn');
+            const projectTitleLink = e.target.closest('.project-title-link');
+            const projectDetailLink = e.target.closest('.project-detail-link');
+            const closeDetailBtn = e.target.closest('#close-detail-modal-btn');
+
+            if(startBtn) startTimer(parseInt(startBtn.closest('.project-card').dataset.projectId));
+            else if(stopBtn) stopTimer();
+            else if(reportFilterBtn){document.querySelectorAll('.report-filter-btn').forEach(b=>b.classList.remove('active', 'bg-blue-600', 'text-white')); reportFilterBtn.classList.add('active', 'bg-blue-600', 'text-white'); generateReport(reportFilterBtn.dataset.period);}
+            else if(editBtn) openEntryModal('edit', parseInt(editBtn.dataset.taskId));
+            else if(deleteBtn) deleteTask(parseInt(deleteBtn.dataset.taskId));
+            else if(projectTitleLink) openProjectDetailModal(parseInt(projectTitleLink.dataset.projectId));
+            else if(projectDetailLink) openProjectDetailModal(parseInt(projectDetailLink.dataset.projectId));
+            else if(closeDetailBtn) closeProjectDetailModal();
+        });
+        
+        // --- Initialization ---
+        const initializeApp = () => { checkPersistentTimer(); loadData(); setInterval(formatCurrentTime, 1000); };
+        initializeApp();
+    });
     </script>
 </body>
 </html>
