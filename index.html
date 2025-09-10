@@ -4,764 +4,378 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Time Tracker</title>
-    <!-- Tailwind CSS CDN -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏱️</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background: #111827;
-        }
-        /* Custom scrollbar for better visual appeal */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1f2937;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6b7280;
-        }
-        .container {
-            max-width: 1200px;
-        }
-        .timer-display {
-            font-variant-numeric: tabular-nums;
-            font-weight: 800;
-        }
-        .project-card {
-            transition: all 0.2s ease-in-out;
-            transform: scale(1);
-        }
-        .project-card:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
-        }
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-        }
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        .container { max-width: 1200px; }
+        .timer-display { font-variant-numeric: tabular-nums; }
+        .project-card { transition: all 0.2s ease-in-out; }
+        .project-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1); }
+        .report-filter-btn.active { background-color: #3B82F6; color: white; }
     </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen p-4 sm:p-8">
 
     <div class="container mx-auto">
-        <!-- Navigation at the top -->
-        <header class="flex justify-between items-center mb-6 pb-4">
+        <header class="flex justify-between items-center mb-6 pb-4 border-b border-gray-700">
             <h1 class="text-3xl sm:text-4xl font-bold text-gray-50">Time Tracker</h1>
-            <div class="flex space-x-4">
-                <button id="dashboard-btn" class="px-4 py-2 font-semibold text-gray-300 rounded-lg hover:bg-gray-700 transition-colors active bg-gray-700">Dashboard</button>
-                <button id="settings-btn" class="px-4 py-2 font-semibold text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">Settings</button>
+            <div class="flex space-x-2">
+                <button id="dashboard-btn" class="px-3 py-2 font-semibold text-gray-200 rounded-lg hover:bg-gray-700 transition-colors active bg-gray-700">Dashboard</button>
+                <button id="reports-btn" class="px-3 py-2 font-semibold text-gray-200 rounded-lg hover:bg-gray-700 transition-colors">Reports</button>
             </div>
         </header>
 
-        <!-- Dashboard Section -->
-        <section id="dashboard" class="block">
+        <section id="dashboard-section" class="block">
             <div class="mb-8 p-4 rounded-xl bg-gray-800 border border-gray-700 text-gray-50 shadow-lg flex justify-between items-center">
-                <div class="flex flex-col">
-                    <h3 class="text-xl font-bold">Current Month's Time</h3>
-                    <p class="text-2xl font-semibold"><span id="current-month-hours">0.00</span> hours</p>
+                <div>
+                    <h3 class="text-lg sm:text-xl font-bold">Today's Time</h3>
+                    <p class="text-xl sm:text-2xl font-semibold"><span id="todays-hours">0.00</span> hours</p>
                 </div>
-                <div class="flex flex-col items-end">
-                    <h3 class="text-xl font-bold">Current Time</h3>
-                    <p class="text-2xl font-semibold timer-display" id="current-time">00:00:00</p>
+                <div class="text-right">
+                    <h3 class="text-lg sm:text-xl font-bold">Current Time</h3>
+                    <p class="text-xl sm:text-2xl font-semibold timer-display" id="current-time">00:00:00</p>
                 </div>
             </div>
-            
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Your Active Projects</h2>
-                <button id="add-project-button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
-                    Add Project
-                </button>
+
+            <div class="mb-8">
+                 <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold">Your Projects</h2>
+                    <button id="add-project-btn" class="bg-blue-500 hover:bg-blue-600 text-white font-bold h-10 w-10 flex items-center justify-center rounded-full transition-transform transform hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    </button>
+                 </div>
+                 <div id="dashboard-projects-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    </div>
             </div>
             
-            <div id="dashboard-projects-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                <!-- Project cards will be rendered here -->
+            <div>
+                <h2 class="text-2xl font-bold mb-4">Today's Log</h2>
+                <div id="todays-log-list" class="space-y-3">
+                    </div>
             </div>
         </section>
 
-        <!-- Settings Section -->
-        <section id="settings-section" class="hidden">
-            <div class="bg-gray-800 p-6 sm:p-10 rounded-xl shadow-lg w-full border border-gray-700">
-                <div class="flex justify-between items-center border-b border-gray-700 pb-4 mb-6">
-                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-50">Settings</h2>
-                </div>
-
-                <!-- Settings Tabs -->
-                <div class="flex border-b border-gray-700 mb-6 overflow-x-auto whitespace-nowrap">
-                    <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg active" data-tab="add-project">Add Project</button>
-                    <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="project-management">Projects List</button>
-                    <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="manual-time">Manual Time</button>
-                    <button class="settings-tab-button px-4 py-3 font-semibold text-gray-400 border-b-2 border-transparent transition-all hover:text-blue-500 hover:border-blue-500 rounded-t-lg" data-tab="report-generation">Reports</button>
-                </div>
-
-                <!-- Add Project Tab -->
-                <div id="add-project" class="settings-tab-content">
-                    <h3 class="text-xl font-bold mb-4">Add New Project</h3>
-                    <form id="add-project-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mb-8 border border-gray-700">
-                        <div>
-                            <label for="project-name" class="block text-sm font-medium text-gray-400">Project Name</label>
-                            <input type="text" id="project-name" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                        </div>
-                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Project</button>
-                    </form>
-                </div>
-
-                <!-- Project Management Tab -->
-                <div id="project-management" class="settings-tab-content hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold">Your Projects</h3>
-                        <button id="toggle-completed-btn" class="bg-gray-700 text-gray-300 font-semibold px-4 py-2 rounded-md hover:bg-gray-600 transition-colors text-sm">View Completed Projects</button>
-                    </div>
-                    <div id="projects-list">
-                        <!-- Projects will be rendered here -->
-                    </div>
-                </div>
-
-                <!-- Manual Time Tab -->
-                <div id="manual-time" class="settings-tab-content hidden">
-                    <h3 class="text-xl font-bold mb-4">Add Manual Time</h3>
-                    <form id="manual-time-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mt-8 border border-gray-700">
-                        <div>
-                            <label for="manual-project-select" class="block text-sm font-medium text-gray-400">Project</label>
-                            <select id="manual-project-select" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2"></select>
-                        </div>
-                        <div>
-                            <label for="manual-task-description" class="block text-sm font-medium text-gray-400">Task Description</label>
-                            <input type="text" id="manual-task-description" class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
-                        </div>
-                        <div>
-                            <label for="manual-minutes" class="block text-sm font-medium text-gray-400">Minutes Spent</label>
-                            <input type="number" id="manual-minutes" min="1" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-4 py-2">
-                        </div>
-                        <button type="submit" class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Add Time</button>
-                    </form>
-                </div>
-
-                <!-- Report Generation Tab -->
-                <div id="report-generation" class="settings-tab-content hidden">
-                    <h3 class="text-xl font-bold mb-4">Generate Report</h3>
-                    <form id="report-form" class="space-y-4 bg-gray-900 p-6 rounded-xl shadow-inner mb-8 border border-gray-700">
-                        <div>
-                            <label for="report-start-date" class="block text-sm font-medium text-gray-400">Start Date</label>
-                            <input type="date" id="report-start-date" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                        </div>
-                        <div>
-                            <label for="report-end-date" class="block text-sm font-medium text-gray-400">End Date</label>
-                            <input type="date" id="report-end-date" required class="mt-1 block w-full rounded-md border-gray-600 shadow-sm bg-gray-700 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition duration-150 ease-in-out px-4 py-2">
-                        </div>
-                        <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Generate Report</button>
-                    </form>
-                    <div id="report-output">
-                        <!-- Report will be displayed here -->
-                    </div>
-                    <div class="mt-8 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button id="export-json-btn" class="w-full sm:w-1/2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export All Data as JSON</button>
-                        <button id="export-csv-btn" class="w-full sm:w-1/2 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">Export Time Log as CSV</button>
-                    </div>
-                </div>
+        <section id="reports-section" class="hidden">
+            <h2 class="text-3xl font-bold mb-4">Reports</h2>
+            <div class="flex space-x-2 mb-6 p-2 bg-gray-800 rounded-lg border border-gray-700 w-full sm:w-auto">
+                <button class="report-filter-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-md font-semibold transition-colors active" data-period="day">Today</button>
+                <button class="report-filter-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-md font-semibold transition-colors" data-period="week">This Week</button>
+                <button class="report-filter-btn flex-grow sm:flex-grow-0 px-4 py-2 rounded-md font-semibold transition-colors" data-period="month">This Month</button>
             </div>
+            <div id="report-output">
+                </div>
         </section>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Global State ---
+        let projects = [];
+        let tasks = [];
+        let activeTimer = null;
+        let timerInterval = null;
+        const projectColors = ['#3B82F6', '#10B981', '#F97316', '#8B5CF6', '#EF4444', '#F9A825', '#EC4899', '#6366F1'];
+        
+        // --- DOM Element Cache ---
+        const elements = {
+            dashboardBtn: document.getElementById('dashboard-btn'),
+            reportsBtn: document.getElementById('reports-btn'),
+            dashboardSection: document.getElementById('dashboard-section'),
+            reportsSection: document.getElementById('reports-section'),
+            todaysHours: document.getElementById('todays-hours'),
+            currentTimeDisplay: document.getElementById('current-time'),
+            dashboardProjectsList: document.getElementById('dashboard-projects-list'),
+            todaysLogList: document.getElementById('todays-log-list'),
+            addProjectBtn: document.getElementById('add-project-btn'),
+            reportOutput: document.getElementById('report-output'),
+        };
 
-            // --- Global Variables ---
-            let projects = [];
-            let activeTimer = null;
-            let timerInterval = null;
-            let showingCompletedProjects = false;
-            
-            const projectColors = ['#F9A825', '#EF4444', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#F97316', '#6366F1'];
-            let colorIndex = 0;
+        // --- Helper Functions ---
+        const formatTime = (milliseconds) => {
+            if (isNaN(milliseconds) || milliseconds < 0) return "00:00:00";
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        };
 
-            const elements = {
-                // Main UI
-                dashboardProjectsList: document.getElementById('dashboard-projects-list'),
-                dashboardBtn: document.getElementById('dashboard-btn'),
-                settingsBtn: document.getElementById('settings-btn'),
-                dashboardSection: document.getElementById('dashboard'),
-                settingsSection: document.getElementById('settings-section'),
-                addProjectButton: document.getElementById('add-project-button'),
-                currentMonthHours: document.getElementById('current-month-hours'),
-                currentTimeDisplay: document.getElementById('current-time'),
-                // Settings Modal
-                settingsTabButtons: document.querySelectorAll('.settings-tab-button'),
-                settingsTabContents: document.querySelectorAll('.settings-tab-content'),
-                // Add Project Tab
-                addProjectForm: document.getElementById('add-project-form'),
-                // Project Management Tab
-                projectsList: document.getElementById('projects-list'),
-                toggleCompletedBtn: document.getElementById('toggle-completed-btn'),
-                // Manual Time Tab
-                manualTimeForm: document.getElementById('manual-time-form'),
-                manualProjectSelect: document.getElementById('manual-project-select'),
-                manualTaskDescription: document.getElementById('manual-task-description'),
-                manualMinutes: document.getElementById('manual-minutes'),
-                // Report Generation Tab
-                reportForm: document.getElementById('report-form'),
-                reportOutput: document.getElementById('report-output'),
-                exportJsonBtn: document.getElementById('export-json-btn'),
-                exportCsvBtn: document.getElementById('export-csv-btn'),
-            };
-            
-            // --- Helper Functions ---
-            const formatTime = (milliseconds) => {
-                const totalSeconds = Math.floor(milliseconds / 1000);
-                const hours = Math.floor(totalSeconds / 3600);
-                const minutes = Math.floor((totalSeconds % 3600) / 60);
-                const seconds = totalSeconds % 60;
-                return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-            };
+        const formatCurrentTime = () => {
+            elements.currentTimeDisplay.textContent = new Date().toLocaleTimeString('en-US');
+        };
 
-            const formatCurrentTime = () => {
-                const now = new Date();
-                const hours = String(now.getHours()).padStart(2, '0');
-                const minutes = String(now.getMinutes()).padStart(2, '0');
-                const seconds = String(now.getSeconds()).padStart(2, '0');
-                elements.currentTimeDisplay.textContent = `${hours}:${minutes}:${seconds}`;
-            };
-            
-            // --- IndexedDB Database Operations ---
-            const DB_NAME = 'timeTrackerDB';
-            const DB_VERSION = 7;
-            let db;
-
-            const openDB = () => {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-                    request.onupgradeneeded = (event) => {
-                        db = event.target.result;
-                        if (!db.objectStoreNames.contains('projects')) {
-                            const projectsStore = db.createObjectStore('projects', { keyPath: 'id', autoIncrement: true });
-                            projectsStore.createIndex('color', 'color', { unique: false });
-                        }
-                        if (!db.objectStoreNames.contains('tasks')) {
-                            const tasksStore = db.createObjectStore('tasks', { keyPath: 'id', autoIncrement: true });
-                            tasksStore.createIndex('projectId', 'projectId', { unique: false });
-                            tasksStore.createIndex('timestamp', 'timestamp', { unique: false });
-                        }
-                    };
-
-                    request.onsuccess = (event) => {
-                        db = event.target.result;
-                        resolve(db);
-                    };
-
-                    request.onerror = (event) => {
-                        console.error('IndexedDB error:', event.target.errorCode);
-                        reject('IndexedDB error');
-                    };
-                });
-            };
-
-            const addData = (storeName, data) => {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.add(data);
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject('Error adding data');
-                });
-            };
-
-            const getAllData = (storeName) => {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readonly');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject('Error getting all data');
-                });
-            };
-            
-            const updateData = (storeName, data) => {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.put(data);
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject('Error updating data');
-                });
-            };
-
-            const deleteData = (storeName, id) => {
-                return new Promise((resolve, reject) => {
-                    const transaction = db.transaction([storeName], 'readwrite');
-                    const store = transaction.objectStore(storeName);
-                    const request = store.delete(id);
-                    request.onsuccess = () => resolve();
-                    request.onerror = () => reject('Error deleting data');
-                });
-            };
-
-            // --- UI Rendering Functions ---
-            const updateCurrentMonthHours = async () => {
-                const now = new Date();
-                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-                const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-
-                const allTasks = await getAllData('tasks');
-                const monthlyTasks = allTasks.filter(task => {
-                    const taskDate = new Date(task.timestamp);
-                    return taskDate >= startOfMonth && taskDate <= endOfMonth;
-                });
-                const totalTimeInHours = monthlyTasks.reduce((sum, task) => sum + (task.duration / 3600000), 0);
-                elements.currentMonthHours.textContent = totalTimeInHours.toFixed(2);
-            };
-
-            const renderProjectsInSettings = async () => {
-                const projectsToRender = showingCompletedProjects ? projects : projects.filter(p => !p.isComplete);
-                
-                elements.toggleCompletedBtn.textContent = showingCompletedProjects ? 'View Active Projects' : 'View All Projects';
-
-                const projectsHTML = projectsToRender.map(project => {
-                    const color = project.color || '#F9A825'; // Fallback color
-                    return `
-                        <div class="project-card bg-gray-700 p-6 rounded-xl shadow-md border-t-4 mb-6 border border-gray-600" style="border-top-color: ${project.isComplete ? '#4B5563' : color};" data-project-id="${project.id}">
-                            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 space-y-2 sm:space-y-0">
-                                <div>
-                                    <h3 class="text-xl font-bold ${project.isComplete ? 'text-gray-400 line-through' : 'text-gray-50'}">${project.name}</h3>
-                                </div>
-                                <div class="flex items-center space-x-2">
-                                    ${project.isComplete
-                                        ? `<button class="restore-btn bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105 text-sm" data-id="${project.id}">Restore</button>`
-                                        : `<button class="complete-btn bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105 text-sm" data-id="${project.id}">Complete</button>`
-                                    }
-                                    <button class="delete-btn text-red-400 hover:text-red-500 font-bold p-2" data-id="${project.id}" data-type="project">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                            <h4 class="font-semibold text-gray-400 text-lg mb-2">Tasks</h4>
-                            <div class="space-y-4" data-project-id="${project.id}">
-                                <!-- Tasks for this project will be rendered here -->
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                elements.projectsList.innerHTML = projectsToRender.length === 0
-                    ? `<p class="text-gray-400 text-center">No ${showingCompletedProjects ? 'completed' : 'active'} projects found.</p>`
-                    : projectsHTML;
-                
-                projectsToRender.forEach(project => renderProjectTasks(project.id));
-            };
-
-            const renderDashboardProjects = async () => {
-                const activeProjects = projects.filter(p => !p.isComplete);
-                const allTasks = await getAllData('tasks');
-                
-                const dashboardHTML = await Promise.all(activeProjects.map(async (project) => {
-                    const isRunning = activeTimer && activeTimer.projectId === project.id;
-                    const latestTasks = allTasks
-                        .filter(task => task.projectId === project.id)
-                        .sort((a, b) => b.timestamp - a.timestamp)
-                        .slice(0, 2);
-
-                    const latestTasksHTML = latestTasks.map(task => `
-                        <p class="text-xs text-gray-500 truncate mt-1">${task.description} - ${formatTime(task.duration)}</p>
-                    `).join('');
-
-                    const activeTimerHTML = isRunning 
-                        ? `<p class="text-2xl font-extrabold timer-display" style="color: ${project.color};" id="timer-display-${project.id}">00:00:00</p>`
-                        : `<p class="text-gray-500 text-2xl font-extrabold">00:00:00</p>`;
-
-                    const actionButtonHTML = isRunning
-                        ? `<button class="stop-timer-btn p-3 bg-red-500 hover:bg-red-600 rounded-full shadow-lg transition-transform transform hover:scale-105" data-project-id="${project.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6 text-white">
-                                <path d="M5.25 7.5A.75.75 0 0 1 6 6.75h12a.75.75 0 0 1 .75.75v6.75a.75.75 0 0 1-.75.75H6a.75.75 0 0 1-.75-.75V7.5Z" />
-                            </svg>
-                           </button>`
-                        : `<button type="button" class="start-timer-btn p-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full shadow-lg transition-transform transform hover:scale-105" data-project-id="${project.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M5 3l14 9-14 9V3z"></path>
-                            </svg>
-                           </button>`;
-                            
-                    return `
-                        <div class="project-card bg-gray-700 p-4 rounded-xl shadow-md border-t-4 border-b-4 ${isRunning ? 'border-yellow-500' : 'border-gray-600'} flex flex-col justify-between aspect-square w-full border" style="border-top-color: ${project.color}; border-bottom-color: ${project.color};" data-project-id="${project.id}">
-                            <div>
-                                <h3 class="font-bold text-lg text-gray-50">${project.name}</h3>
-                            </div>
-                            <div class="flex-grow flex flex-col items-center justify-center space-y-2">
-                                ${activeTimerHTML}
-                                <input type="text" placeholder="What are you doing?" class="task-description-input w-full rounded-md border-gray-600 shadow-sm bg-gray-800 text-white focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50 transition px-3 py-2 text-sm text-center">
-                                ${actionButtonHTML}
-                            </div>
-                            <div class="mt-2 pt-2 border-t border-gray-600">
-                                <p class="text-xs font-semibold text-gray-400">Recent entries:</p>
-                                ${latestTasksHTML || '<p class="text-xs text-gray-500">No entries yet.</p>'}
-                            </div>
-                        </div>
-                    `;
-                }));
-                
-                elements.dashboardProjectsList.innerHTML = dashboardHTML.join('') || '<p class="text-gray-400 text-center">No active projects to display. Please add one using the + button.</p>';
-
-                if (activeTimer) {
-                    clearInterval(timerInterval);
-                    timerInterval = setInterval(updateTimerDisplay, 1000);
-                }
-
-                // Update manual time form project options
-                const activeProjectsForManualTime = activeProjects.map(project => `
-                    <option value="${project.id}">${project.name}</option>
-                `).join('');
-                elements.manualProjectSelect.innerHTML = activeProjectsForManualTime || '<option value="">No projects available</option>';
-            };
-            
-            const renderProjectTasks = async (projectId) => {
-                const allTasks = await getAllData('tasks');
-                const projectTasks = allTasks.filter(task => task.projectId === projectId);
-                const taskContainer = document.querySelector(`.project-card[data-project-id="${projectId}"] .space-y-4`);
-
-                if (!taskContainer) return;
-
-                const taskHTML = projectTasks.map(task => {
-                    const durationText = formatTime(task.duration);
-                    
-                    return `
-                        <div class="bg-gray-800 p-4 rounded-lg shadow-inner border border-gray-700 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0 mb-2">
-                            <div class="flex-grow w-full">
-                                <p class="font-semibold text-gray-50 break-words">${task.description}</p>
-                                <p class="text-sm text-gray-400">Duration: ${durationText}</p>
-                                <p class="text-xs text-gray-500">Date: ${new Date(task.timestamp).toLocaleDateString()}</p>
-                            </div>
-                            <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-                                <button class="delete-task-btn text-red-400 hover:text-red-500 font-bold p-2" data-task-id="${task.id}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm6 0a1 1 0 112 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                taskContainer.innerHTML = taskHTML || '<p class="text-gray-400">No tasks logged yet.</p>';
-            };
-
-            const updateTimerDisplay = () => {
-                if (activeTimer) {
-                    const elapsed = Date.now() - activeTimer.startTime;
-                    const timerEl = document.getElementById(`timer-display-${activeTimer.projectId}`);
-                    if (timerEl) {
-                        timerEl.textContent = formatTime(elapsed);
-                    }
+        // --- IndexedDB ---
+        let db;
+        const openDB = () => new Promise((resolve) => {
+            const request = indexedDB.open('timeTrackerDB', 8);
+            request.onupgradeneeded = e => {
+                db = e.target.result;
+                if (!db.objectStoreNames.contains('projects')) db.createObjectStore('projects', { keyPath: 'id', autoIncrement: true });
+                if (!db.objectStoreNames.contains('tasks')) {
+                    const tasksStore = db.createObjectStore('tasks', { keyPath: 'id', autoIncrement: true });
+                    tasksStore.createIndex('timestamp', 'timestamp', { unique: false });
                 }
             };
-            
-            // --- Event Handlers ---
-            elements.dashboardBtn.addEventListener('click', () => {
-                elements.dashboardSection.classList.remove('hidden');
-                elements.settingsSection.classList.add('hidden');
-                elements.dashboardBtn.classList.add('active', 'bg-gray-700');
-                elements.settingsBtn.classList.remove('active', 'bg-gray-700');
-                renderDashboardProjects();
-            });
-
-            elements.settingsBtn.addEventListener('click', () => {
-                elements.settingsSection.classList.remove('hidden');
-                elements.dashboardSection.classList.add('hidden');
-                elements.settingsBtn.classList.add('active', 'bg-gray-700');
-                elements.dashboardBtn.classList.remove('active', 'bg-gray-700');
-                // Auto-select first tab
-                elements.settingsTabButtons[0].click();
-            });
-
-            elements.addProjectButton.addEventListener('click', () => {
-                elements.settingsSection.classList.remove('hidden');
-                elements.dashboardSection.classList.add('hidden');
-                elements.settingsBtn.classList.add('active', 'bg-gray-700');
-                elements.dashboardBtn.classList.remove('active', 'bg-gray-700');
-                document.querySelector('.settings-tab-button[data-tab="add-project"]').click();
-            });
-
-            elements.settingsTabButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const tabName = e.target.dataset.tab;
-                    elements.settingsTabButtons.forEach(btn => btn.classList.remove('active'));
-                    e.target.classList.add('active');
-                    elements.settingsTabContents.forEach(content => content.classList.add('hidden'));
-                    document.getElementById(tabName).classList.remove('hidden');
-                });
-            });
-
-            elements.addProjectForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = document.getElementById('project-name').value;
-                if (!name) {
-                    // No need to show a message, the required attribute handles this
-                    return;
-                }
-                const newProject = { 
-                    name, 
-                    isComplete: false,
-                    color: projectColors[colorIndex]
-                };
-                colorIndex = (colorIndex + 1) % projectColors.length;
-                
-                await addData('projects', newProject);
-                elements.addProjectForm.reset();
-                await loadAllData();
-            });
-
-            elements.toggleCompletedBtn.addEventListener('click', async () => {
-                showingCompletedProjects = !showingCompletedProjects;
-                await renderProjectsInSettings();
-            });
-
-            elements.manualTimeForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const projectId = parseInt(elements.manualProjectSelect.value);
-                const description = elements.manualTaskDescription.value || 'Untitled Task';
-                const minutes = parseInt(elements.manualMinutes.value);
-
-                if (!projectId || isNaN(minutes) || minutes <= 0) {
-                    return;
-                }
-                
-                const task = {
-                    projectId,
-                    description,
-                    duration: minutes * 60 * 1000,
-                    timestamp: Date.now()
-                };
-                await addData('tasks', task);
-                elements.manualTimeForm.reset();
-                updateCurrentMonthHours();
-            });
-
-            document.addEventListener('click', async (e) => {
-                const startBtn = e.target.closest('.start-timer-btn');
-                if (startBtn) {
-                    e.preventDefault();
-                    if (activeTimer) {
-                        return;
-                    }
-                    const projectId = parseInt(startBtn.dataset.projectId);
-                    const card = startBtn.closest('.project-card');
-                    const descriptionInput = card.querySelector('.task-description-input');
-                    const description = descriptionInput.value || 'Untitled Task';
-                    
-                    activeTimer = {
-                        projectId,
-                        description,
-                        startTime: Date.now()
-                    };
-                    
-                    renderDashboardProjects();
-                }
-
-                const stopBtn = e.target.closest('.stop-timer-btn');
-                if (stopBtn) {
-                    e.preventDefault();
-                    const projectId = parseInt(stopBtn.dataset.projectId);
-                    if (activeTimer && activeTimer.projectId === projectId) {
-                        const duration = Date.now() - activeTimer.startTime;
-                        const task = {
-                            projectId: activeTimer.projectId,
-                            description: activeTimer.description,
-                            duration,
-                            timestamp: Date.now()
-                        };
-                        
-                        await addData('tasks', task);
-                        clearInterval(timerInterval);
-                        activeTimer = null;
-                        renderDashboardProjects();
-                        renderProjectTasks(task.projectId);
-                        updateCurrentMonthHours();
-                    }
-                }
-
-                if (e.target.closest('.delete-btn')) {
-                    const btn = e.target.closest('.delete-btn');
-                    const id = parseInt(btn.dataset.id);
-                    const type = btn.dataset.type;
-                    await deleteData(type + 's', id);
-                    await loadAllData();
-                }
-
-                if (e.target.closest('.delete-task-btn')) {
-                    const btn = e.target.closest('.delete-task-btn');
-                    const taskId = parseInt(btn.dataset.taskId);
-                    const projectId = parseInt(btn.closest('.project-card').dataset.projectId);
-                    await deleteData('tasks', taskId);
-                    await renderProjectTasks(projectId);
-                }
-                
-                if (e.target.matches('.complete-btn') || e.target.matches('.restore-btn')) {
-                    const btn = e.target;
-                    const projectId = parseInt(btn.dataset.id);
-                    const projectToUpdate = projects.find(p => p.id === projectId);
-                    if (projectToUpdate) {
-                        projectToUpdate.isComplete = !projectToUpdate.isComplete;
-                        await updateData('projects', projectToUpdate);
-                        await renderProjectsInSettings();
-                    }
-                }
-            });
-
-            elements.reportForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const startDate = new Date(document.getElementById('report-start-date').value);
-                const endDate = new Date(document.getElementById('report-end-date').value);
-                
-                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                    return;
-                }
-                
-                const allTasks = await getAllData('tasks');
-                const filteredTasks = allTasks.filter(task => {
-                    const taskDate = new Date(task.timestamp);
-                    return taskDate >= startDate && taskDate <= endDate;
-                });
-                
-                const report = {};
-                
-                filteredTasks.forEach(task => {
-                    const project = projects.find(p => p.id === task.projectId);
-                    if (!project) return;
-                    
-                    const projectName = project.name;
-                    const durationInHours = task.duration / 3600000;
-                    
-                    if (!report[projectName]) {
-                        report[projectName] = { totalTime: 0, tasks: [] };
-                    }
-                    
-                    report[projectName].totalTime += durationInHours;
-                    report[projectName].tasks.push({ description: task.description, duration: durationInHours });
-                });
-
-                renderReport(report);
-            });
-            
-            const renderReport = (report) => {
-                let reportHTML = '';
-                let grandTotalTime = 0;
-
-                for (const projectName in report) {
-                    const projectReport = report[projectName];
-                    grandTotalTime += projectReport.totalTime;
-                    
-                    reportHTML += `
-                        <div class="bg-gray-700 p-6 rounded-xl shadow-md border-t-4 border-blue-500 mb-6 border border-gray-600">
-                            <h3 class="text-xl font-bold text-gray-50">${projectName}</h3>
-                            <p class="text-sm text-gray-400">Total Time: ${projectReport.totalTime.toFixed(2)} hours</p>
-                            
-                            <div class="mt-4 space-y-4">
-                                ${projectReport.tasks.map(task => `
-                                    <div class="bg-gray-800 p-4 rounded-lg shadow-inner border border-gray-700">
-                                        <p class="font-semibold text-gray-50">${task.description}</p>
-                                        <p class="text-xs text-gray-400">Duration: ${task.duration.toFixed(2)} hours</p>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                }
-
-                if (Object.keys(report).length === 0) {
-                    elements.reportOutput.innerHTML = '<p class="text-gray-400 text-center">No data found for this date range.</p>';
-                } else {
-                    elements.reportOutput.innerHTML = `
-                        <div class="bg-blue-900 p-6 rounded-xl border border-blue-500 shadow mb-6 text-center">
-                            <h3 class="text-2xl font-bold text-blue-300">Grand Total</h3>
-                            <p class="text-lg text-gray-200">Total Time: <span class="font-semibold">${grandTotalTime.toFixed(2)} hours</span></p>
-                        </div>
-                        ${reportHTML}
-                    `;
-                }
-            };
-
-            // --- Export Functions ---
-            const downloadFile = (data, filename, type) => {
-                const blob = new Blob([data], { type: type });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            };
-
-            const exportDataAsJSON = async () => {
-                const allData = {
-                    projects: await getAllData('projects'),
-                    tasks: await getAllData('tasks')
-                };
-                const jsonString = JSON.stringify(allData, null, 2);
-                downloadFile(jsonString, 'time_tracker_data.json', 'application/json');
-            };
-
-            const exportDataAsCSV = async () => {
-                const allTasks = await getAllData('tasks');
-                const allProjects = await getAllData('projects');
-                
-                const projectsMap = new Map(allProjects.map(p => [p.id, p]));
-
-                const headers = ['Date', 'Project', 'Task Description', 'Duration (mins)', 'Duration (hours)'];
-                let csvContent = headers.join(',') + '\n';
-                
-                allTasks.forEach(task => {
-                    const project = projectsMap.get(task.projectId);
-                    
-                    const date = new Date(task.timestamp).toLocaleDateString();
-                    const projectName = project ? project.name : 'N/A';
-                    const description = task.description.replace(/,/g, '');
-                    const durationMins = (task.duration / 60000).toFixed(2);
-                    const durationHours = (task.duration / 3600000).toFixed(2);
-
-                    const row = [date, projectName, description, durationMins, durationHours];
-                    csvContent += row.join(',') + '\n';
-                });
-                
-                downloadFile(csvContent, 'time_tracker_report.csv', 'text/csv');
-            };
-            
-            elements.exportJsonBtn.addEventListener('click', exportDataAsJSON);
-            elements.exportCsvBtn.addEventListener('click', exportDataAsCSV);
-
-            // --- Initialization ---
-            const loadAllData = async () => {
-                try {
-                    await openDB();
-                    projects = await getAllData('projects');
-                    renderProjectsInSettings();
-                    renderDashboardProjects();
-                    updateCurrentMonthHours();
-                } catch (err) {
-                    console.error('Failed to initialize the application.', err);
-                }
-            };
-            
-            // Set default dates for report form
-            const today = new Date();
-            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-            document.getElementById('report-start-date').value = startOfMonth.toISOString().split('T')[0];
-            document.getElementById('report-end-date').value = today.toISOString().split('T')[0];
-            
-            setInterval(formatCurrentTime, 1000);
-            
-            loadAllData();
+            request.onsuccess = e => { db = e.target.result; resolve(db); };
         });
+        const addData = (storeName, data) => new Promise((resolve) => {
+            db.transaction(storeName, 'readwrite').objectStore(storeName).add(data).onsuccess = e => resolve(e.target.result);
+        });
+        const getAllData = (storeName) => new Promise((resolve) => {
+            db.transaction(storeName, 'readonly').objectStore(storeName).getAll().onsuccess = e => resolve(e.target.result);
+        });
+
+        // --- Data & State Management ---
+        const loadData = async () => {
+            await openDB();
+            [projects, tasks] = await Promise.all([getAllData('projects'), getAllData('tasks')]);
+            renderAllDashboard();
+        };
+        
+        const checkPersistentTimer = () => {
+            const savedTimer = localStorage.getItem('activeTimerState');
+            if (savedTimer) {
+                activeTimer = JSON.parse(savedTimer);
+                startTimerInterval();
+            }
+        };
+
+        // --- Core Application Logic ---
+        const startTimer = (projectId) => {
+            const card = document.querySelector(`.project-card[data-project-id="${projectId}"]`);
+            const description = card.querySelector('.task-description-input').value.trim() || 'Untitled Task';
+
+            if(activeTimer) {
+                alert('Another timer is already running. Please stop it first.');
+                return;
+            }
+
+            activeTimer = { projectId, description, startTime: Date.now() };
+            localStorage.setItem('activeTimerState', JSON.stringify(activeTimer));
+            startTimerInterval();
+            renderDashboardProjects();
+        };
+
+        const stopTimer = async () => {
+            if (!activeTimer) return;
+            const { projectId, description, startTime } = activeTimer;
+            const task = { projectId, description, duration: Date.now() - startTime, timestamp: Date.now() };
+            
+            tasks.push({ ...task, id: await addData('tasks', task) });
+
+            localStorage.removeItem('activeTimerState');
+            activeTimer = null;
+            stopTimerInterval();
+            renderAllDashboard();
+        };
+        
+        const addProject = async () => {
+            const name = prompt("Enter new project name:");
+            if (name && name.trim()) {
+                const newProject = { 
+                    name: name.trim(), 
+                    isComplete: false,
+                    color: projectColors[projects.length % projectColors.length]
+                };
+                projects.push({ ...newProject, id: await addData('projects', newProject) });
+                renderAllDashboard();
+            }
+        };
+
+        const startTimerInterval = () => {
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (activeTimer) {
+                    const timerDisplay = document.getElementById(`timer-display-${activeTimer.projectId}`);
+                    if (timerDisplay) timerDisplay.textContent = formatTime(Date.now() - activeTimer.startTime);
+                }
+            }, 1000);
+        };
+        
+        const stopTimerInterval = () => {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        };
+
+        // --- UI Rendering Functions ---
+        const renderAllDashboard = () => {
+            renderDashboardProjects();
+            updateTodaysMetrics();
+            renderTodaysLog();
+        };
+
+        const updateTodaysMetrics = () => {
+            const now = new Date();
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+            const totalTimeInMillis = tasks
+                .filter(task => task.timestamp >= startOfDay)
+                .reduce((sum, task) => sum + task.duration, 0);
+            elements.todaysHours.textContent = (totalTimeInMillis / 3600000).toFixed(2);
+        };
+        
+        const renderDashboardProjects = () => {
+            const activeProjects = projects.filter(p => !p.isComplete);
+            elements.dashboardProjectsList.innerHTML = activeProjects.map(project => {
+                const isRunning = activeTimer && activeTimer.projectId === project.id;
+                const buttonHTML = isRunning
+                    ? `<button class="stop-timer-btn w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-b-lg transition-colors">Stop</button>`
+                    : `<button class="start-timer-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-b-lg transition-colors" data-project-id="${project.id}">Start</button>`;
+                
+                return `
+                    <div class="project-card bg-gray-800 rounded-lg shadow-lg flex flex-col border-2 ${isRunning ? 'border-yellow-400' : 'border-gray-700'}" data-project-id="${project.id}">
+                        <div class="p-4 flex-grow">
+                            <h3 class="font-bold text-xl mb-2">${project.name}</h3>
+                            <p id="timer-display-${project.id}" class="text-4xl font-bold timer-display mb-3 ${isRunning ? 'text-yellow-400' : 'text-gray-500'}">
+                                ${isRunning ? formatTime(Date.now() - activeTimer.startTime) : '00:00:00'}
+                            </p>
+                            <input type="text" placeholder="What are you working on?" 
+                                   class="task-description-input w-full bg-gray-700 text-white p-2 rounded-md border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                   ${isRunning ? `value="${activeTimer.description}" disabled` : ''}>
+                        </div>
+                        ${buttonHTML}
+                    </div>
+                `;
+            }).join('') || `<p class="text-gray-500 col-span-full">No active projects found. Click the '+' button to add one.</p>`;
+        };
+
+        const renderTodaysLog = () => {
+            const startOfDay = new Date().setHours(0, 0, 0, 0);
+            const todaysTasks = tasks.filter(t => t.timestamp >= startOfDay).sort((a, b) => b.timestamp - a.timestamp);
+
+            if (todaysTasks.length === 0) {
+                elements.todaysLogList.innerHTML = `<p class="text-gray-500 text-center bg-gray-800 p-4 rounded-lg">No time logged yet today.</p>`;
+                return;
+            }
+
+            elements.todaysLogList.innerHTML = todaysTasks.map(task => {
+                const project = projects.find(p => p.id === task.projectId);
+                return `
+                    <div class="bg-gray-800 p-4 rounded-lg flex items-center justify-between border-l-4" style="border-color: ${project?.color || '#71717a'};">
+                        <div>
+                            <p class="font-semibold text-white">${task.description}</p>
+                            <p class="text-sm text-gray-400">${project?.name || 'Unknown'}</p>
+                        </div>
+                        <span class="font-semibold text-lg timer-display">${formatTime(task.duration)}</span>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        // --- Report Generation ---
+        const generateReport = (period) => {
+            const now = new Date();
+            let startDate, endDate = now;
+
+            if (period === 'day') {
+                startDate = new Date(now).setHours(0, 0, 0, 0);
+            } else if (period === 'week') {
+                const firstDayOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+                startDate = firstDayOfWeek.setHours(0, 0, 0, 0);
+            } else if (period === 'month') {
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1).setHours(0, 0, 0, 0);
+            }
+
+            const filteredTasks = tasks.filter(t => t.timestamp >= startDate && t.timestamp <= endDate);
+            
+            if (filteredTasks.length === 0) {
+                elements.reportOutput.innerHTML = `<p class="text-gray-500 text-center bg-gray-800 p-6 rounded-lg">No data for this period.</p>`;
+                return;
+            }
+
+            const grandTotal = filteredTasks.reduce((sum, t) => sum + t.duration, 0);
+            const reportData = {};
+
+            filteredTasks.forEach(task => {
+                if (!reportData[task.projectId]) {
+                    const project = projects.find(p => p.id === task.projectId);
+                    reportData[task.projectId] = {
+                        name: project?.name || 'Unknown Project',
+                        color: project?.color || '#71717a',
+                        totalDuration: 0,
+                        entries: []
+                    };
+                }
+                reportData[task.projectId].totalDuration += task.duration;
+                reportData[task.projectId].entries.push(task);
+            });
+
+            let reportHTML = `
+                <div class="bg-blue-900/50 p-6 rounded-xl border border-blue-500 shadow mb-6">
+                    <h3 class="text-2xl font-bold text-blue-300">Grand Total for ${period.charAt(0).toUpperCase() + period.slice(1)}</h3>
+                    <p class="text-4xl font-bold text-white">${formatTime(grandTotal)}</p>
+                </div>
+            `;
+            
+            for (const projectId in reportData) {
+                const data = reportData[projectId];
+                data.entries.sort((a,b) => b.timestamp - a.timestamp); // Sort entries for display
+                reportHTML += `
+                    <div class="bg-gray-800 rounded-lg mb-6 border-t-4" style="border-color: ${data.color};">
+                        <header class="p-4 flex justify-between items-center border-b border-gray-700">
+                            <h4 class="text-xl font-bold">${data.name}</h4>
+                            <span class="text-2xl font-semibold timer-display">${formatTime(data.totalDuration)}</span>
+                        </header>
+                        <div class="p-4 space-y-3">
+                            ${data.entries.map(entry => `
+                                <div class="flex justify-between items-center bg-gray-900/50 p-3 rounded-md">
+                                    <div>
+                                        <p>${entry.description}</p>
+                                        <p class="text-xs text-gray-400">${new Date(entry.timestamp).toLocaleDateString()}</p>
+                                    </div>
+                                    <span class="font-mono">${formatTime(entry.duration)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            elements.reportOutput.innerHTML = reportHTML;
+        };
+
+        // --- Event Handlers ---
+        elements.dashboardBtn.addEventListener('click', () => {
+            elements.dashboardSection.classList.remove('hidden');
+            elements.reportsSection.classList.add('hidden');
+            elements.dashboardBtn.classList.add('active', 'bg-gray-700');
+            elements.reportsBtn.classList.remove('active', 'bg-gray-700');
+            renderAllDashboard();
+        });
+
+        elements.reportsBtn.addEventListener('click', () => {
+            elements.reportsSection.classList.remove('hidden');
+            elements.dashboardSection.classList.add('hidden');
+            elements.reportsBtn.classList.add('active', 'bg-gray-700');
+            elements.dashboardBtn.classList.remove('active', 'bg-gray-700');
+            generateReport('day'); // Default to daily report
+        });
+        
+        elements.addProjectBtn.addEventListener('click', addProject);
+
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('.start-timer-btn')) startTimer(parseInt(e.target.dataset.projectId));
+            if (e.target.matches('.stop-timer-btn')) stopTimer();
+            if (e.target.matches('.report-filter-btn')) {
+                document.querySelectorAll('.report-filter-btn').forEach(btn => btn.classList.remove('active'));
+                e.target.classList.add('active');
+                generateReport(e.target.dataset.period);
+            }
+        });
+        
+        // --- Initialization ---
+        const initializeApp = () => {
+            checkPersistentTimer();
+            loadData();
+            setInterval(formatCurrentTime, 1000);
+        };
+        
+        initializeApp();
+    });
     </script>
 </body>
 </html>
