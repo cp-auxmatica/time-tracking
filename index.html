@@ -131,6 +131,7 @@
             reportDateRange: document.getElementById('report-date-range'),
             importJsonBtn: document.getElementById('import-json-btn'), exportJsonBtn: document.getElementById('export-json-btn'),
             exportCsvBtn: document.getElementById('export-csv-btn'), importFileInput: document.getElementById('import-file-input'),
+            settingsDropdownContainer: document.getElementById('settings-dropdown-container')
         };
 
         // --- Helper Functions ---
@@ -143,7 +144,17 @@
 
         // --- IndexedDB ---
         let db; const DB_VERSION = 11;
-        const openDB = () => new Promise(r=>{const req=indexedDB.open('timeTrackerDB',DB_VERSION);req.onupgradeneeded=e=>{db=e.target.result;if(!db.objectStoreNames.contains('projects'))db.createObjectStore('projects',{keyPath:'id',autoIncrement:true});if(!db.objectStoreNames.contains('tasks'))db.createObjectStore('tasks',{keyPath:'id',autoIncrement:true}).createIndex('startTime','startTime');};req.onsuccess=e=>{db=e.target.result;r(db)};});
+        const openDB = () => new Promise((resolve, reject) => {
+            if (db) return resolve(db);
+            const req = indexedDB.open('timeTrackerDB', DB_VERSION);
+            req.onupgradeneeded = e => {
+                const tempDb = e.target.result;
+                if (!tempDb.objectStoreNames.contains('projects')) tempDb.createObjectStore('projects', { keyPath: 'id', autoIncrement: true });
+                if (!tempDb.objectStoreNames.contains('tasks')) tempDb.createObjectStore('tasks', { keyPath: 'id', autoIncrement: true }).createIndex('startTime', 'startTime');
+            };
+            req.onsuccess = e => { db = e.target.result; resolve(db); };
+            req.onerror = e => reject(e.target.error);
+        });
         const addData = (store, data) => new Promise(r => db.transaction(store, 'readwrite').objectStore(store).add(data).onsuccess = e => r(e.target.result));
         const getAllData = (store) => new Promise(r => db.transaction(store, 'readonly').objectStore(store).getAll().onsuccess = e => r(e.target.result));
         const updateData = (store, data) => new Promise(r => db.transaction(store, 'readwrite').objectStore(store).put(data).onsuccess = () => r());
@@ -207,7 +218,7 @@
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
-                    await openDB(); // <-- FIX IS HERE
+                    await openDB();
                     const importedData = JSON.parse(e.target.result);
                     if (!Array.isArray(importedData.projects) || !Array.isArray(importedData.tasks)) throw new Error("Invalid file format.");
 
@@ -221,11 +232,17 @@
                         }
                         const tasksToAdd = importedData.tasks.map(t => { const { id, ...taskData } = t; return {...taskData, projectId: newProjectsMap.get(t.projectId)}; });
                         await Promise.all(tasksToAdd.map(t => t.projectId ? addData('tasks', t) : null));
+                        
+                        await loadData(); // Reloads all data from DB and re-renders
                         alert("Data imported successfully!");
-                        await loadData();
+                    } else {
+                        alert("Import canceled.");
                     }
-                } catch (error) { alert("Failed to import data: " + error.message); } 
-                finally { elements.importFileInput.value = null; }
+                } catch (error) { 
+                    alert("Failed to import data: " + error.message); 
+                } finally { 
+                    elements.importFileInput.value = null; 
+                }
             };
             reader.readAsText(file);
         };
@@ -380,12 +397,22 @@
         elements.entrySaveBtn.onclick = saveEntry;
         elements.entryCancelBtn.onclick = closeEntryModal;
         elements.modalBackdrop.onclick = () => { closeEntryModal(); closeProjectDetailModal(); };
+        
+        elements.settingsBtn.onclick = (e) => {
+            e.stopPropagation();
+            elements.settingsDropdownContainer.classList.toggle('active');
+        };
         elements.importJsonBtn.onclick = () => elements.importFileInput.click();
         elements.importFileInput.onchange = importDataFromJSON;
         elements.exportJsonBtn.onclick = exportDataAsJSON;
         elements.exportCsvBtn.onclick = exportDataAsCSV;
         
         document.addEventListener('click', e => {
+            // Close dropdown if click is outside
+            if (elements.settingsDropdownContainer.classList.contains('active') && !elements.settingsDropdownContainer.contains(e.target)) {
+                elements.settingsDropdownContainer.classList.remove('active');
+            }
+
             const startBtn=e.target.closest('.start-timer-btn'), stopBtn=e.target.closest('.stop-timer-btn'), editBtn=e.target.closest('.edit-task-btn'), deleteBtn=e.target.closest('.delete-task-btn'), projectDetailLink=e.target.closest('.project-detail-link'), closeDetailBtn=e.target.closest('#close-detail-modal-btn'), editProjectBtn=e.target.closest('.edit-project-btn'), deleteProjectBtn = e.target.closest('.delete-project-btn');
             if(startBtn) startTimer(parseInt(startBtn.closest('.project-card').dataset.projectId));
             else if(stopBtn) stopTimer();
