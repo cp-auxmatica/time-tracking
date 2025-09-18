@@ -143,7 +143,7 @@
         };
 
         // --- IndexedDB ---
-        let db; const DB_VERSION = 11;
+        let db; const DB_VERSION = 12; // <-- THE FIX IS HERE
         const openDB = () => new Promise((resolve, reject) => {
             if (db) return resolve(db);
             const req = indexedDB.open('timeTrackerDB', DB_VERSION);
@@ -337,7 +337,7 @@
             window.handleProjectColorChange = handleProjectColorChange;
         };
         const createTaskEntryHTML = (t) => { const p=projects.find(p=>p.id===t.projectId),sT=new Date(t.startTime),eT=new Date(t.endTime),d=t.endTime-t.startTime; return `<div class="bg-gray-800 p-3 rounded-lg flex items-center justify-between border-l-4 shadow-sm" style="border-color:${p?.color||'#71717a'};"><div class="flex-grow"><p class="font-semibold">${t.description}</p><p class="text-sm text-gray-400">${p?.name||'Unknown'} &bull; ${sT.toLocaleDateString()} &bull; ${sT.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} - ${eT.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</p></div><div class="flex items-center space-x-4"><span class="font-semibold text-lg timer-display">${formatTime(d)}</span><div class="dropdown"><button class="text-gray-400 hover:text-white p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg></button><div class="dropdown-content"><button class="edit-task-btn" data-task-id="${t.id}">Edit</button><button class="delete-task-btn" data-task-id="${t.id}">Delete</button></div></div></div></div>`; };
-        const renderTodaysLog = () => { const s=new Date().setHours(0,0,0,0),t=tasks.filter(t=>t.endTime>=s).sort((a,b)=>b.startTime-a.startTime); elements.todaysLogList.innerHTML=t.length>0?t.map(createTaskEntryHTML).join(''):`<p class="text-gray-500 text-center bg-gray-800 p-4 rounded-lg">No time logged today.</p>`; };
+        const renderTodaysLog = () => { const s=new Date().setHours(0,0,0,0),t=tasks.filter(t=>t.endTime>=s).sort((a,b)=>b.startTime-a-startTime); elements.todaysLogList.innerHTML=t.length>0?t.map(createTaskEntryHTML).join(''):`<p class="text-gray-500 text-center bg-gray-800 p-4 rounded-lg">No time logged today.</p>`; };
         
         // --- Report & Project Detail Generation ---
         const openProjectDetailModal = (projectId) => {
