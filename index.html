@@ -37,6 +37,7 @@
                         <button id="import-json-btn">Import from JSON</button>
                         <button id="export-json-btn">Export to JSON</button>
                         <button id="export-csv-btn">Export to CSV</button>
+                        <button id="force-reset-btn" class="text-red-400 hover:bg-red-900/50 hover:text-red-300">Force Reset Application</button>
                     </div>
                 </div>
             </div>
@@ -131,7 +132,8 @@
             reportDateRange: document.getElementById('report-date-range'),
             importJsonBtn: document.getElementById('import-json-btn'), exportJsonBtn: document.getElementById('export-json-btn'),
             exportCsvBtn: document.getElementById('export-csv-btn'), importFileInput: document.getElementById('import-file-input'),
-            settingsDropdownContainer: document.getElementById('settings-dropdown-container')
+            settingsDropdownContainer: document.getElementById('settings-dropdown-container'),
+            forceResetBtn: document.getElementById('force-reset-btn')
         };
 
         // --- Helper Functions ---
@@ -143,7 +145,7 @@
         };
 
         // --- IndexedDB ---
-        let db; const DB_VERSION = 25; // <-- THE FIX IS HERE
+        let db; const DB_VERSION = 25; // A high version number to avoid future conflicts
         const openDB = () => new Promise((resolve, reject) => {
             if (db) return resolve(db);
             const req = indexedDB.open('timeTrackerDB', DB_VERSION);
@@ -185,7 +187,7 @@
         const startTimerInterval = () => { if(timerInterval)clearInterval(timerInterval); timerInterval = setInterval(() => { if (activeTimer) { const el = document.getElementById(`timer-display-${activeTimer.projectId}`); if (el) el.textContent = formatTime(Date.now() - activeTimer.startTime); } }, 1000); };
         const stopTimerInterval = () => { clearInterval(timerInterval); timerInterval = null; };
 
-        // --- Import / Export ---
+        // --- Import / Export & Reset ---
         const downloadFile = (data, filename, type) => {
             const blob = new Blob([data], { type });
             const url = URL.createObjectURL(blob);
@@ -245,6 +247,28 @@
                 }
             };
             reader.readAsText(file);
+        };
+        const forceResetApplication = () => {
+            if (activeTimer) {
+                stopTimerInterval();
+                localStorage.removeItem('activeTimerState');
+                activeTimer = null;
+            }
+            if (db) {
+                db.close();
+                db = null;
+            }
+            if (confirm("DANGER: This will delete all projects and tasks from your browser. This action cannot be undone. Are you sure?")) {
+                if (confirm("Please confirm again. All local data will be permanently deleted.")) {
+                    const deleteRequest = indexedDB.deleteDatabase('timeTrackerDB');
+                    deleteRequest.onsuccess = () => {
+                        alert("Application data has been reset. The page will now reload.");
+                        window.location.reload();
+                    };
+                    deleteRequest.onerror = () => alert("Could not delete the database. Please try clearing your browser's site data manually.");
+                    deleteRequest.onblocked = () => alert("Database is blocked. Please close other tabs with this app open and try again.");
+                }
+            }
         };
 
         // --- Entry Modal Logic ---
@@ -337,7 +361,7 @@
             window.handleProjectColorChange = handleProjectColorChange;
         };
         const createTaskEntryHTML = (t) => { const p=projects.find(p=>p.id===t.projectId),sT=new Date(t.startTime),eT=new Date(t.endTime),d=t.endTime-t.startTime; return `<div class="bg-gray-800 p-3 rounded-lg flex items-center justify-between border-l-4 shadow-sm" style="border-color:${p?.color||'#71717a'};"><div class="flex-grow"><p class="font-semibold">${t.description}</p><p class="text-sm text-gray-400">${p?.name||'Unknown'} &bull; ${sT.toLocaleDateString()} &bull; ${sT.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})} - ${eT.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</p></div><div class="flex items-center space-x-4"><span class="font-semibold text-lg timer-display">${formatTime(d)}</span><div class="dropdown"><button class="text-gray-400 hover:text-white p-2 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" /></svg></button><div class="dropdown-content"><button class="edit-task-btn" data-task-id="${t.id}">Edit</button><button class="delete-task-btn" data-task-id="${t.id}">Delete</button></div></div></div></div>`; };
-        const renderTodaysLog = () => { const s=new Date().setHours(0,0,0,0),t=tasks.filter(t=>t.endTime>=s).sort((a,b)=>b.startTime-a-startTime); elements.todaysLogList.innerHTML=t.length>0?t.map(createTaskEntryHTML).join(''):`<p class="text-gray-500 text-center bg-gray-800 p-4 rounded-lg">No time logged today.</p>`; };
+        const renderTodaysLog = () => { const s=new Date().setHours(0,0,0,0),t=tasks.filter(t=>t.endTime>=s).sort((a,b)=>b.startTime-a.startTime); elements.todaysLogList.innerHTML=t.length>0?t.map(createTaskEntryHTML).join(''):`<p class="text-gray-500 text-center bg-gray-800 p-4 rounded-lg">No time logged today.</p>`; };
         
         // --- Report & Project Detail Generation ---
         const openProjectDetailModal = (projectId) => {
@@ -406,6 +430,7 @@
         elements.importFileInput.onchange = importDataFromJSON;
         elements.exportJsonBtn.onclick = exportDataAsJSON;
         elements.exportCsvBtn.onclick = exportDataAsCSV;
+        elements.forceResetBtn.onclick = forceResetApplication;
         
         document.addEventListener('click', e => {
             // Close dropdown if click is outside
