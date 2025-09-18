@@ -143,7 +143,7 @@
         };
 
         // --- IndexedDB ---
-        let db; const DB_VERSION = 12; // <-- THE FIX IS HERE
+        let db; const DB_VERSION = 25; // <-- THE FIX IS HERE
         const openDB = () => new Promise((resolve, reject) => {
             if (db) return resolve(db);
             const req = indexedDB.open('timeTrackerDB', DB_VERSION);
