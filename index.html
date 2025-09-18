@@ -207,6 +207,7 @@
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
+                    await openDB(); // <-- FIX IS HERE
                     const importedData = JSON.parse(e.target.result);
                     if (!Array.isArray(importedData.projects) || !Array.isArray(importedData.tasks)) throw new Error("Invalid file format.");
 
